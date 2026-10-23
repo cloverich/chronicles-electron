@@ -82,5 +82,21 @@ function locateDestination(
       best = { start: start + i, end: start + i + c.length };
     }
   }
+  if (!best) {
+    // Written with backslash escapes, e.g. `../_attachments/a\(2\).png`.
+    for (const m of span.matchAll(escapedPattern(node.url))) {
+      best = { start: start + m.index, end: start + m.index + m[0].length };
+    }
+  }
   return best;
+}
+
+/** Matches `url` with an optional backslash before each ASCII punctuation character. */
+function escapedPattern(url: string): RegExp {
+  let src = "";
+  for (const ch of url) {
+    const lit = ch.replace(/[\\^$.*+?()[\]{}|/-]/g, "\\$&");
+    src += /[!-/:-@[-`{-~]/.test(ch) ? `\\\\?${lit}` : lit;
+  }
+  return new RegExp(src, "g");
 }

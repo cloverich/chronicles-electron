@@ -65,6 +65,7 @@ describe("AttachmentStore.migrateLegacyLayout", () => {
     fs.writeFileSync(path.join(legacy, "a.png"), "png-bytes");
     fs.writeFileSync(path.join(legacy, "sp ace.txt"), "text-bytes");
     fs.writeFileSync(path.join(legacy, "dup.png"), "png-bytes");
+    fs.writeFileSync(path.join(legacy, "par(2).png"), "png-bytes");
     fs.writeFileSync(path.join(legacy, ".DS_Store"), "ignored");
 
     const content = [
@@ -72,6 +73,7 @@ describe("AttachmentStore.migrateLegacyLayout", () => {
       "![a again](chronicles://../_attachments/a.png)",
       "[text](../_attachments/sp%20ace.txt)",
       "![dup](../_attachments/dup.png)",
+      "![escaped](../_attachments/par\\(2\\).png)",
       "![gone](../_attachments/missing.png)",
       "`![code](../_attachments/a.png)`",
       "",
@@ -92,7 +94,7 @@ describe("AttachmentStore.migrateLegacyLayout", () => {
   test("moves flat files into the pool and rewrites references", async () => {
     const { client, notesDir, id, content } = await legacyLibrary("legacy");
     const result = await client.files.attachments.migrateLegacyLayout();
-    assert.deepStrictEqual(result, { files: 3, notesUpdated: 1 });
+    assert.deepStrictEqual(result, { files: 4, notesUpdated: 1 });
 
     const doc = await client.documents.findById({ id });
     const png = ref("png-bytes", ".png");
@@ -105,7 +107,8 @@ describe("AttachmentStore.migrateLegacyLayout", () => {
           "(../_attachments/sp%20ace.txt)",
           `(${ref("text-bytes", ".txt")})`,
         )
-        .replace("(../_attachments/dup.png)", `(${png})`),
+        .replace("(../_attachments/dup.png)", `(${png})`)
+        .replace("(../_attachments/par\\(2\\).png)", `(${png})`),
     );
 
     const remaining = fs
