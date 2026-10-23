@@ -68,7 +68,10 @@ if (args.apply) {
     usage("--apply needs --backup <path.zip> (or --no-backup).");
   let running = false;
   try {
-    execFileSync("pgrep", ["-x", "Chronicles"], { stdio: "ignore" });
+    // The Mac app only; the iOS simulator's Chronicles process is also named Chronicles.
+    execFileSync("pgrep", ["-f", "Chronicles.app/Contents/MacOS/Chronicles"], {
+      stdio: "ignore",
+    });
     running = true;
   } catch {
     // not running
