@@ -74,6 +74,7 @@ describe("AttachmentStore.migrateLegacyLayout", () => {
       "[text](../_attachments/sp%20ace.txt)",
       "![dup](../_attachments/dup.png)",
       "![escaped](../_attachments/par\\(2\\).png)",
+      "![bracketed](<../_attachments/a.png>)",
       "![gone](../_attachments/missing.png)",
       "`![code](../_attachments/a.png)`",
       "",
@@ -108,7 +109,8 @@ describe("AttachmentStore.migrateLegacyLayout", () => {
           `(${ref("text-bytes", ".txt")})`,
         )
         .replace("(../_attachments/dup.png)", `(${png})`)
-        .replace("(../_attachments/par\\(2\\).png)", `(${png})`),
+        .replace("(../_attachments/par\\(2\\).png)", `(${png})`)
+        .replace("(<../_attachments/a.png>)", `(${png})`),
     );
 
     const remaining = fs

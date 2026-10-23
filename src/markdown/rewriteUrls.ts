@@ -31,6 +31,14 @@ export function rewriteUrls(
       if (replacement !== undefined && replacement !== urlNode.url) {
         const edit = locateDestination(markdown, urlNode);
         if (edit) {
+          // Drop angle brackets the new URL no longer needs, e.g.
+          // <../_attachments/a b.png> -> chronicles://attachment/<sha>.png.
+          const bracketed =
+            markdown[edit.start - 1] === "<" && markdown[edit.end] === ">";
+          if (bracketed && !/[\s<>()]/.test(replacement)) {
+            edit.start--;
+            edit.end++;
+          }
           edits.push({ ...edit, text: replacement });
         } else {
           unmatched.push(urlNode.url);
