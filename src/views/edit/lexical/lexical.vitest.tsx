@@ -430,6 +430,19 @@ describe("lexical migration spike", () => {
     );
   });
 
+  it("imports images with an angle-bracketed destination or a title", () => {
+    const src = `chronicles://attachment/${"a".repeat(64)}.png`;
+    expect(roundtripLexicalMarkdown(`![desk](<${src}>)`)).toBe(
+      `![desk](${src})`,
+    );
+    expect(roundtripLexicalMarkdown(`![desk](${src} "desk")`)).toBe(
+      `![desk](${src})`,
+    );
+    expect(
+      roundtripLexicalMarkdown("![a desk](<../_attachments/a desk.png>)"),
+    ).toBe("![a desk](<../_attachments/a desk.png>)");
+  });
+
   it("renders the lexical replacement seam", () => {
     const onMarkdownChange = vi.fn();
 

@@ -40,7 +40,9 @@ import {
   MarkdownTableNode,
 } from "./MarkdownTableNode";
 
-const IMAGE_ELEMENT_REGEXP = /^!\[([^[\]]*)\]\(([^()\s]+)\)\s?$/;
+// ![alt](src), ![alt](<src>), and either with a "title" (dropped).
+const IMAGE_ELEMENT_REGEXP =
+  /^!\[([^[\]]*)\]\((?:<([^<>\n]+)>|([^()\s]+))(?:\s+"[^"]*")?\)\s?$/;
 const NOTE_LINK_IMPORT_REGEXP =
   /(?:\[([^[\]]*(?:\[[^[\]]*\][^[\]]*)*)\])(?:\((\.\.\/[^()\s]+\.md|chronicles:\/\/note\/[a-zA-Z0-9-]+)(?:\s"((?:[^"]*\\")*[^"]*)"\s*)?\))/;
 const NOTE_LINK_SHORTCUT_REGEXP =
@@ -98,11 +100,12 @@ export const CHRONICLES_IMAGE_TRANSFORMER: ElementTransformer = {
       .replace(/\[/g, "\\[")
       .replace(/\]/g, "\\]");
     const src = unPrefixUrl(node.getSrc()).replace(/\)/g, "%29");
-    return `![${altText}](${src})`;
+    return /\s/.test(src) ? `![${altText}](<${src}>)` : `![${altText}](${src})`;
   },
   regExp: IMAGE_ELEMENT_REGEXP,
   replace: (parentNode, _children, match) => {
-    const [, altText, src] = match;
+    const [, altText, bracketed, bare] = match;
+    const src = bracketed ?? bare;
     parentNode.replace(
       $createChroniclesImageNode(normalizeImageSource(src), altText),
     );
