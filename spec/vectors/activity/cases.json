@@ -1,0 +1,1928 @@
+{
+  "cases": [
+    {
+      "name": "edits coalesce while they keep coming",
+      "library": {
+        "journals": [
+          {
+            "id": "j1",
+            "name": "Personal"
+          },
+          {
+            "id": "j2",
+            "name": "Work"
+          }
+        ],
+        "notes": [
+          {
+            "id": "n1",
+            "journalId": "j1",
+            "title": "Groceries",
+            "content": "milk\n",
+            "tags": [
+              "home"
+            ],
+            "createdAt": "2026-09-01T09:00:00.000Z",
+            "updatedAt": "2026-09-01T09:00:00.000Z"
+          },
+          {
+            "id": "n2",
+            "journalId": "j2",
+            "title": "Standup",
+            "content": "notes\n",
+            "tags": [
+              "meeting"
+            ],
+            "createdAt": "2026-09-01T09:00:00.000Z",
+            "updatedAt": "2026-09-01T09:00:00.000Z"
+          },
+          {
+            "id": "n3",
+            "journalId": "j2",
+            "title": null,
+            "content": "\n\nFirst real line of an untitled note\nsecond\n",
+            "tags": [],
+            "createdAt": "2026-09-01T09:00:00.000Z",
+            "updatedAt": "2026-09-01T09:00:00.000Z"
+          }
+        ]
+      },
+      "steps": [
+        {
+          "at": "2026-10-01T10:00:00.000Z",
+          "op": "updateNote",
+          "id": "n1",
+          "content": "milk\neggs\n"
+        },
+        {
+          "at": "2026-10-01T10:04:00.000Z",
+          "op": "updateNote",
+          "id": "n1",
+          "content": "milk\neggs\nbread\n"
+        },
+        {
+          "at": "2026-10-01T10:13:00.000Z",
+          "op": "updateNote",
+          "id": "n1",
+          "content": "milk\neggs\nbread\nbutter\n"
+        },
+        {
+          "at": "2026-10-01T10:30:00.000Z",
+          "op": "updateNote",
+          "id": "n1",
+          "content": "milk\neggs\nbread\nbutter\njam\n"
+        }
+      ],
+      "expected": [
+        {
+          "kind": "edited",
+          "origin": "user",
+          "at": "2026-10-01T10:30:00.000Z",
+          "noteId": "n1",
+          "journalId": "j1",
+          "title": "Groceries",
+          "journalName": "Personal",
+          "batch": null,
+          "detail": {
+            "edits": 1
+          },
+          "restorable": false
+        },
+        {
+          "kind": "edited",
+          "origin": "user",
+          "at": "2026-10-01T10:13:00.000Z",
+          "noteId": "n1",
+          "journalId": "j1",
+          "title": "Groceries",
+          "journalName": "Personal",
+          "batch": null,
+          "detail": {
+            "edits": 3
+          },
+          "restorable": false
+        }
+      ]
+    },
+    {
+      "name": "renames coalesce apart from edits",
+      "library": {
+        "journals": [
+          {
+            "id": "j1",
+            "name": "Personal"
+          },
+          {
+            "id": "j2",
+            "name": "Work"
+          }
+        ],
+        "notes": [
+          {
+            "id": "n1",
+            "journalId": "j1",
+            "title": "Groceries",
+            "content": "milk\n",
+            "tags": [
+              "home"
+            ],
+            "createdAt": "2026-09-01T09:00:00.000Z",
+            "updatedAt": "2026-09-01T09:00:00.000Z"
+          },
+          {
+            "id": "n2",
+            "journalId": "j2",
+            "title": "Standup",
+            "content": "notes\n",
+            "tags": [
+              "meeting"
+            ],
+            "createdAt": "2026-09-01T09:00:00.000Z",
+            "updatedAt": "2026-09-01T09:00:00.000Z"
+          },
+          {
+            "id": "n3",
+            "journalId": "j2",
+            "title": null,
+            "content": "\n\nFirst real line of an untitled note\nsecond\n",
+            "tags": [],
+            "createdAt": "2026-09-01T09:00:00.000Z",
+            "updatedAt": "2026-09-01T09:00:00.000Z"
+          }
+        ]
+      },
+      "steps": [
+        {
+          "at": "2026-10-01T10:00:00.000Z",
+          "op": "updateNote",
+          "id": "n1",
+          "title": "Grocer"
+        },
+        {
+          "at": "2026-10-01T10:01:00.000Z",
+          "op": "updateNote",
+          "id": "n1",
+          "title": "Groceries list",
+          "content": "milk\nbread\n"
+        }
+      ],
+      "expected": [
+        {
+          "kind": "edited",
+          "origin": "user",
+          "at": "2026-10-01T10:01:00.000Z",
+          "noteId": "n1",
+          "journalId": "j1",
+          "title": "Groceries list",
+          "journalName": "Personal",
+          "batch": null,
+          "detail": {
+            "edits": 1
+          },
+          "restorable": false
+        },
+        {
+          "kind": "renamed",
+          "origin": "user",
+          "at": "2026-10-01T10:01:00.000Z",
+          "noteId": "n1",
+          "journalId": "j1",
+          "title": "Groceries list",
+          "journalName": "Personal",
+          "batch": null,
+          "detail": {
+            "from": "Groceries",
+            "to": "Groceries list"
+          },
+          "restorable": false
+        }
+      ]
+    },
+    {
+      "name": "one update, every aspect",
+      "library": {
+        "journals": [
+          {
+            "id": "j1",
+            "name": "Personal"
+          },
+          {
+            "id": "j2",
+            "name": "Work"
+          }
+        ],
+        "notes": [
+          {
+            "id": "n1",
+            "journalId": "j1",
+            "title": "Groceries",
+            "content": "milk\n",
+            "tags": [
+              "home"
+            ],
+            "createdAt": "2026-09-01T09:00:00.000Z",
+            "updatedAt": "2026-09-01T09:00:00.000Z"
+          },
+          {
+            "id": "n2",
+            "journalId": "j2",
+            "title": "Standup",
+            "content": "notes\n",
+            "tags": [
+              "meeting"
+            ],
+            "createdAt": "2026-09-01T09:00:00.000Z",
+            "updatedAt": "2026-09-01T09:00:00.000Z"
+          },
+          {
+            "id": "n3",
+            "journalId": "j2",
+            "title": null,
+            "content": "\n\nFirst real line of an untitled note\nsecond\n",
+            "tags": [],
+            "createdAt": "2026-09-01T09:00:00.000Z",
+            "updatedAt": "2026-09-01T09:00:00.000Z"
+          }
+        ]
+      },
+      "steps": [
+        {
+          "at": "2026-10-01T10:00:00.000Z",
+          "op": "updateNote",
+          "id": "n1",
+          "journalId": "j2",
+          "title": "Shopping",
+          "tags": [
+            "errand"
+          ],
+          "content": "milk\nbread\n"
+        }
+      ],
+      "expected": [
+        {
+          "kind": "edited",
+          "origin": "user",
+          "at": "2026-10-01T10:00:00.000Z",
+          "noteId": "n1",
+          "journalId": "j2",
+          "title": "Shopping",
+          "journalName": "Work",
+          "batch": null,
+          "detail": {
+            "edits": 1
+          },
+          "restorable": false
+        },
+        {
+          "kind": "untagged",
+          "origin": "user",
+          "at": "2026-10-01T10:00:00.000Z",
+          "noteId": "n1",
+          "journalId": "j2",
+          "title": "Shopping",
+          "journalName": "Work",
+          "batch": null,
+          "detail": {
+            "tags": [
+              "home"
+            ]
+          },
+          "restorable": false
+        },
+        {
+          "kind": "tagged",
+          "origin": "user",
+          "at": "2026-10-01T10:00:00.000Z",
+          "noteId": "n1",
+          "journalId": "j2",
+          "title": "Shopping",
+          "journalName": "Work",
+          "batch": null,
+          "detail": {
+            "tags": [
+              "errand"
+            ]
+          },
+          "restorable": false
+        },
+        {
+          "kind": "renamed",
+          "origin": "user",
+          "at": "2026-10-01T10:00:00.000Z",
+          "noteId": "n1",
+          "journalId": "j2",
+          "title": "Shopping",
+          "journalName": "Work",
+          "batch": null,
+          "detail": {
+            "from": "Groceries",
+            "to": "Shopping"
+          },
+          "restorable": false
+        },
+        {
+          "kind": "moved",
+          "origin": "user",
+          "at": "2026-10-01T10:00:00.000Z",
+          "noteId": "n1",
+          "journalId": "j2",
+          "title": "Shopping",
+          "journalName": "Work",
+          "batch": null,
+          "detail": {
+            "from": "Personal",
+            "to": "Work"
+          },
+          "restorable": false
+        }
+      ]
+    },
+    {
+      "name": "nothing changed, nothing logged",
+      "library": {
+        "journals": [
+          {
+            "id": "j1",
+            "name": "Personal"
+          },
+          {
+            "id": "j2",
+            "name": "Work"
+          }
+        ],
+        "notes": [
+          {
+            "id": "n1",
+            "journalId": "j1",
+            "title": "Groceries",
+            "content": "milk\n",
+            "tags": [
+              "home"
+            ],
+            "createdAt": "2026-09-01T09:00:00.000Z",
+            "updatedAt": "2026-09-01T09:00:00.000Z"
+          },
+          {
+            "id": "n2",
+            "journalId": "j2",
+            "title": "Standup",
+            "content": "notes\n",
+            "tags": [
+              "meeting"
+            ],
+            "createdAt": "2026-09-01T09:00:00.000Z",
+            "updatedAt": "2026-09-01T09:00:00.000Z"
+          },
+          {
+            "id": "n3",
+            "journalId": "j2",
+            "title": null,
+            "content": "\n\nFirst real line of an untitled note\nsecond\n",
+            "tags": [],
+            "createdAt": "2026-09-01T09:00:00.000Z",
+            "updatedAt": "2026-09-01T09:00:00.000Z"
+          }
+        ]
+      },
+      "steps": [
+        {
+          "at": "2026-10-01T10:00:00.000Z",
+          "op": "updateNote",
+          "id": "n1",
+          "content": "milk\n"
+        },
+        {
+          "at": "2026-10-01T10:05:00.000Z",
+          "op": "updateNote",
+          "id": "n1",
+          "tags": [
+            "home"
+          ]
+        }
+      ],
+      "expected": []
+    },
+    {
+      "name": "untitled notes are labeled by their first line",
+      "library": {
+        "journals": [
+          {
+            "id": "j1",
+            "name": "Personal"
+          },
+          {
+            "id": "j2",
+            "name": "Work"
+          }
+        ],
+        "notes": [
+          {
+            "id": "n1",
+            "journalId": "j1",
+            "title": "Groceries",
+            "content": "milk\n",
+            "tags": [
+              "home"
+            ],
+            "createdAt": "2026-09-01T09:00:00.000Z",
+            "updatedAt": "2026-09-01T09:00:00.000Z"
+          },
+          {
+            "id": "n2",
+            "journalId": "j2",
+            "title": "Standup",
+            "content": "notes\n",
+            "tags": [
+              "meeting"
+            ],
+            "createdAt": "2026-09-01T09:00:00.000Z",
+            "updatedAt": "2026-09-01T09:00:00.000Z"
+          },
+          {
+            "id": "n3",
+            "journalId": "j2",
+            "title": null,
+            "content": "\n\nFirst real line of an untitled note\nsecond\n",
+            "tags": [],
+            "createdAt": "2026-09-01T09:00:00.000Z",
+            "updatedAt": "2026-09-01T09:00:00.000Z"
+          }
+        ]
+      },
+      "steps": [
+        {
+          "at": "2026-10-01T10:00:00.000Z",
+          "op": "updateNote",
+          "id": "n3",
+          "content": "\n\nFirst real line of an untitled note\nsecond\nthird\n"
+        },
+        {
+          "at": "2026-10-01T10:01:00.000Z",
+          "op": "createNote",
+          "id": "n9",
+          "journalId": "j1",
+          "content": "   This first line is deliberately longer than sixty characters, to cut\nmore\n"
+        }
+      ],
+      "expected": [
+        {
+          "kind": "created",
+          "origin": "user",
+          "at": "2026-10-01T10:01:00.000Z",
+          "noteId": "n9",
+          "journalId": "j1",
+          "title": "This first line is deliberately longer than sixty characters",
+          "journalName": "Personal",
+          "batch": null,
+          "detail": {},
+          "restorable": false
+        },
+        {
+          "kind": "edited",
+          "origin": "user",
+          "at": "2026-10-01T10:00:00.000Z",
+          "noteId": "n3",
+          "journalId": "j2",
+          "title": "First real line of an untitled note",
+          "journalName": "Work",
+          "batch": null,
+          "detail": {
+            "edits": 1
+          },
+          "restorable": false
+        }
+      ]
+    },
+    {
+      "name": "a delete keeps the note, and restore brings it back",
+      "library": {
+        "journals": [
+          {
+            "id": "j1",
+            "name": "Personal"
+          },
+          {
+            "id": "j2",
+            "name": "Work"
+          }
+        ],
+        "notes": [
+          {
+            "id": "n1",
+            "journalId": "j1",
+            "title": "Groceries",
+            "content": "milk\n",
+            "tags": [
+              "home"
+            ],
+            "createdAt": "2026-09-01T09:00:00.000Z",
+            "updatedAt": "2026-09-01T09:00:00.000Z"
+          },
+          {
+            "id": "n2",
+            "journalId": "j2",
+            "title": "Standup",
+            "content": "notes\n",
+            "tags": [
+              "meeting"
+            ],
+            "createdAt": "2026-09-01T09:00:00.000Z",
+            "updatedAt": "2026-09-01T09:00:00.000Z"
+          },
+          {
+            "id": "n3",
+            "journalId": "j2",
+            "title": null,
+            "content": "\n\nFirst real line of an untitled note\nsecond\n",
+            "tags": [],
+            "createdAt": "2026-09-01T09:00:00.000Z",
+            "updatedAt": "2026-09-01T09:00:00.000Z"
+          }
+        ]
+      },
+      "steps": [
+        {
+          "at": "2026-10-01T10:00:00.000Z",
+          "op": "deleteNote",
+          "id": "n1"
+        },
+        {
+          "at": "2026-10-01T10:05:00.000Z",
+          "op": "restore",
+          "noteId": "n1"
+        }
+      ],
+      "expected": [
+        {
+          "kind": "restored",
+          "origin": "user",
+          "at": "2026-10-01T10:05:00.000Z",
+          "noteId": "n1",
+          "journalId": "j1",
+          "title": "Groceries",
+          "journalName": "Personal",
+          "batch": null,
+          "detail": {},
+          "restorable": false
+        },
+        {
+          "kind": "deleted",
+          "origin": "user",
+          "at": "2026-10-01T10:00:00.000Z",
+          "noteId": "n1",
+          "journalId": "j1",
+          "title": "Groceries",
+          "journalName": "Personal",
+          "batch": null,
+          "detail": {
+            "restoredAt": "2026-10-01T10:05:00.000Z"
+          },
+          "restorable": false
+        }
+      ],
+      "notes": [
+        {
+          "id": "n1",
+          "journalId": "j1",
+          "title": "Groceries",
+          "content": "milk\n",
+          "tags": [
+            "home"
+          ],
+          "createdAt": "2026-09-01T09:00:00.000Z",
+          "updatedAt": "2026-09-01T09:00:00.000Z"
+        }
+      ]
+    },
+    {
+      "name": "restoring over a live note fails",
+      "library": {
+        "journals": [
+          {
+            "id": "j1",
+            "name": "Personal"
+          },
+          {
+            "id": "j2",
+            "name": "Work"
+          }
+        ],
+        "notes": [
+          {
+            "id": "n1",
+            "journalId": "j1",
+            "title": "Groceries",
+            "content": "milk\n",
+            "tags": [
+              "home"
+            ],
+            "createdAt": "2026-09-01T09:00:00.000Z",
+            "updatedAt": "2026-09-01T09:00:00.000Z"
+          },
+          {
+            "id": "n2",
+            "journalId": "j2",
+            "title": "Standup",
+            "content": "notes\n",
+            "tags": [
+              "meeting"
+            ],
+            "createdAt": "2026-09-01T09:00:00.000Z",
+            "updatedAt": "2026-09-01T09:00:00.000Z"
+          },
+          {
+            "id": "n3",
+            "journalId": "j2",
+            "title": null,
+            "content": "\n\nFirst real line of an untitled note\nsecond\n",
+            "tags": [],
+            "createdAt": "2026-09-01T09:00:00.000Z",
+            "updatedAt": "2026-09-01T09:00:00.000Z"
+          }
+        ]
+      },
+      "steps": [
+        {
+          "at": "2026-10-01T10:00:00.000Z",
+          "op": "deleteNote",
+          "id": "n1"
+        },
+        {
+          "at": "2026-10-01T10:01:00.000Z",
+          "op": "createNote",
+          "id": "n1",
+          "journalId": "j1",
+          "title": "Again",
+          "content": "x\n"
+        },
+        {
+          "at": "2026-10-01T10:02:00.000Z",
+          "op": "restore",
+          "error": "conflict",
+          "noteId": "n1"
+        }
+      ],
+      "expected": [
+        {
+          "kind": "created",
+          "origin": "user",
+          "at": "2026-10-01T10:01:00.000Z",
+          "noteId": "n1",
+          "journalId": "j1",
+          "title": "Again",
+          "journalName": "Personal",
+          "batch": null,
+          "detail": {},
+          "restorable": false
+        },
+        {
+          "kind": "deleted",
+          "origin": "user",
+          "at": "2026-10-01T10:00:00.000Z",
+          "noteId": "n1",
+          "journalId": "j1",
+          "title": "Groceries",
+          "journalName": "Personal",
+          "batch": null,
+          "detail": {},
+          "restorable": true
+        }
+      ]
+    },
+    {
+      "name": "a journal delete is one batch, and restores as one",
+      "library": {
+        "journals": [
+          {
+            "id": "j1",
+            "name": "Personal"
+          },
+          {
+            "id": "j2",
+            "name": "Work"
+          }
+        ],
+        "notes": [
+          {
+            "id": "n1",
+            "journalId": "j1",
+            "title": "Groceries",
+            "content": "milk\n",
+            "tags": [
+              "home"
+            ],
+            "createdAt": "2026-09-01T09:00:00.000Z",
+            "updatedAt": "2026-09-01T09:00:00.000Z"
+          },
+          {
+            "id": "n2",
+            "journalId": "j2",
+            "title": "Standup",
+            "content": "notes\n",
+            "tags": [
+              "meeting"
+            ],
+            "createdAt": "2026-09-01T09:00:00.000Z",
+            "updatedAt": "2026-09-01T09:00:00.000Z"
+          },
+          {
+            "id": "n3",
+            "journalId": "j2",
+            "title": null,
+            "content": "\n\nFirst real line of an untitled note\nsecond\n",
+            "tags": [],
+            "createdAt": "2026-09-01T09:00:00.000Z",
+            "updatedAt": "2026-09-01T09:00:00.000Z"
+          }
+        ]
+      },
+      "steps": [
+        {
+          "at": "2026-10-01T10:00:00.000Z",
+          "op": "deleteJournal",
+          "id": "j2"
+        },
+        {
+          "at": "2026-10-01T10:10:00.000Z",
+          "op": "restoreBatch",
+          "noteId": "n2"
+        }
+      ],
+      "expected": [
+        {
+          "kind": "restored",
+          "origin": "user",
+          "at": "2026-10-01T10:10:00.000Z",
+          "noteId": "n3",
+          "journalId": "j2",
+          "title": "First real line of an untitled note",
+          "journalName": "Work",
+          "batch": "B",
+          "detail": {},
+          "restorable": false
+        },
+        {
+          "kind": "restored",
+          "origin": "user",
+          "at": "2026-10-01T10:10:00.000Z",
+          "noteId": "n2",
+          "journalId": "j2",
+          "title": "Standup",
+          "journalName": "Work",
+          "batch": "B",
+          "detail": {},
+          "restorable": false
+        },
+        {
+          "kind": "journal.created",
+          "origin": "user",
+          "at": "2026-10-01T10:10:00.000Z",
+          "noteId": null,
+          "journalId": "j2",
+          "title": null,
+          "journalName": "Work",
+          "batch": "B",
+          "detail": {},
+          "restorable": false
+        },
+        {
+          "kind": "journal.deleted",
+          "origin": "user",
+          "at": "2026-10-01T10:00:00.000Z",
+          "noteId": null,
+          "journalId": "j2",
+          "title": null,
+          "journalName": "Work",
+          "batch": "A",
+          "detail": {
+            "notes": 2
+          },
+          "restorable": false
+        },
+        {
+          "kind": "deleted",
+          "origin": "user",
+          "at": "2026-10-01T10:00:00.000Z",
+          "noteId": "n3",
+          "journalId": "j2",
+          "title": "First real line of an untitled note",
+          "journalName": "Work",
+          "batch": "A",
+          "detail": {
+            "restoredAt": "2026-10-01T10:10:00.000Z"
+          },
+          "restorable": false
+        },
+        {
+          "kind": "deleted",
+          "origin": "user",
+          "at": "2026-10-01T10:00:00.000Z",
+          "noteId": "n2",
+          "journalId": "j2",
+          "title": "Standup",
+          "journalName": "Work",
+          "batch": "A",
+          "detail": {
+            "restoredAt": "2026-10-01T10:10:00.000Z"
+          },
+          "restorable": false
+        }
+      ],
+      "notes": [
+        {
+          "id": "n2",
+          "journalId": "j2",
+          "title": "Standup",
+          "content": "notes\n",
+          "tags": [
+            "meeting"
+          ],
+          "createdAt": "2026-09-01T09:00:00.000Z",
+          "updatedAt": "2026-09-01T09:00:00.000Z"
+        },
+        {
+          "id": "n3",
+          "journalId": "j2",
+          "title": null,
+          "content": "\n\nFirst real line of an untitled note\nsecond\n",
+          "tags": [],
+          "createdAt": "2026-09-01T09:00:00.000Z",
+          "updatedAt": "2026-09-01T09:00:00.000Z"
+        }
+      ]
+    },
+    {
+      "name": "a re-created journal takes a free name",
+      "library": {
+        "journals": [
+          {
+            "id": "j1",
+            "name": "Personal"
+          },
+          {
+            "id": "j2",
+            "name": "Work"
+          }
+        ],
+        "notes": [
+          {
+            "id": "n1",
+            "journalId": "j1",
+            "title": "Groceries",
+            "content": "milk\n",
+            "tags": [
+              "home"
+            ],
+            "createdAt": "2026-09-01T09:00:00.000Z",
+            "updatedAt": "2026-09-01T09:00:00.000Z"
+          },
+          {
+            "id": "n2",
+            "journalId": "j2",
+            "title": "Standup",
+            "content": "notes\n",
+            "tags": [
+              "meeting"
+            ],
+            "createdAt": "2026-09-01T09:00:00.000Z",
+            "updatedAt": "2026-09-01T09:00:00.000Z"
+          },
+          {
+            "id": "n3",
+            "journalId": "j2",
+            "title": null,
+            "content": "\n\nFirst real line of an untitled note\nsecond\n",
+            "tags": [],
+            "createdAt": "2026-09-01T09:00:00.000Z",
+            "updatedAt": "2026-09-01T09:00:00.000Z"
+          }
+        ]
+      },
+      "steps": [
+        {
+          "at": "2026-10-01T10:00:00.000Z",
+          "op": "deleteJournal",
+          "id": "j2"
+        },
+        {
+          "at": "2026-10-01T10:01:00.000Z",
+          "op": "createJournal",
+          "id": "j3",
+          "name": "work"
+        },
+        {
+          "at": "2026-10-01T10:02:00.000Z",
+          "op": "restore",
+          "noteId": "n2"
+        }
+      ],
+      "expected": [
+        {
+          "kind": "restored",
+          "origin": "user",
+          "at": "2026-10-01T10:02:00.000Z",
+          "noteId": "n2",
+          "journalId": "j2",
+          "title": "Standup",
+          "journalName": "Work 2",
+          "batch": null,
+          "detail": {},
+          "restorable": false
+        },
+        {
+          "kind": "journal.created",
+          "origin": "user",
+          "at": "2026-10-01T10:02:00.000Z",
+          "noteId": null,
+          "journalId": "j2",
+          "title": null,
+          "journalName": "Work 2",
+          "batch": null,
+          "detail": {},
+          "restorable": false
+        },
+        {
+          "kind": "journal.created",
+          "origin": "user",
+          "at": "2026-10-01T10:01:00.000Z",
+          "noteId": null,
+          "journalId": "j3",
+          "title": null,
+          "journalName": "work",
+          "batch": null,
+          "detail": {},
+          "restorable": false
+        },
+        {
+          "kind": "journal.deleted",
+          "origin": "user",
+          "at": "2026-10-01T10:00:00.000Z",
+          "noteId": null,
+          "journalId": "j2",
+          "title": null,
+          "journalName": "Work",
+          "batch": "A",
+          "detail": {
+            "notes": 2
+          },
+          "restorable": false
+        },
+        {
+          "kind": "deleted",
+          "origin": "user",
+          "at": "2026-10-01T10:00:00.000Z",
+          "noteId": "n3",
+          "journalId": "j2",
+          "title": "First real line of an untitled note",
+          "journalName": "Work",
+          "batch": "A",
+          "detail": {},
+          "restorable": true
+        },
+        {
+          "kind": "deleted",
+          "origin": "user",
+          "at": "2026-10-01T10:00:00.000Z",
+          "noteId": "n2",
+          "journalId": "j2",
+          "title": "Standup",
+          "journalName": "Work",
+          "batch": "A",
+          "detail": {
+            "restoredAt": "2026-10-01T10:02:00.000Z"
+          },
+          "restorable": false
+        }
+      ]
+    },
+    {
+      "name": "bulk changes log only the notes they change",
+      "library": {
+        "journals": [
+          {
+            "id": "j1",
+            "name": "Personal"
+          },
+          {
+            "id": "j2",
+            "name": "Work"
+          }
+        ],
+        "notes": [
+          {
+            "id": "n1",
+            "journalId": "j1",
+            "title": "Groceries",
+            "content": "milk\n",
+            "tags": [
+              "home"
+            ],
+            "createdAt": "2026-09-01T09:00:00.000Z",
+            "updatedAt": "2026-09-01T09:00:00.000Z"
+          },
+          {
+            "id": "n2",
+            "journalId": "j2",
+            "title": "Standup",
+            "content": "notes\n",
+            "tags": [
+              "meeting"
+            ],
+            "createdAt": "2026-09-01T09:00:00.000Z",
+            "updatedAt": "2026-09-01T09:00:00.000Z"
+          },
+          {
+            "id": "n3",
+            "journalId": "j2",
+            "title": null,
+            "content": "\n\nFirst real line of an untitled note\nsecond\n",
+            "tags": [],
+            "createdAt": "2026-09-01T09:00:00.000Z",
+            "updatedAt": "2026-09-01T09:00:00.000Z"
+          }
+        ]
+      },
+      "steps": [
+        {
+          "at": "2026-10-01T10:00:00.000Z",
+          "op": "bulk",
+          "query": {
+            "journalIds": [
+              "j2"
+            ]
+          },
+          "addTag": "meeting"
+        },
+        {
+          "at": "2026-10-01T10:05:00.000Z",
+          "op": "bulk",
+          "query": {
+            "tags": [
+              "meeting"
+            ]
+          },
+          "changeJournal": "j1"
+        }
+      ],
+      "expected": [
+        {
+          "kind": "moved",
+          "origin": "user",
+          "at": "2026-10-01T10:05:00.000Z",
+          "noteId": "n3",
+          "journalId": "j1",
+          "title": "First real line of an untitled note",
+          "journalName": "Personal",
+          "batch": "B",
+          "detail": {
+            "from": "Work",
+            "to": "Personal"
+          },
+          "restorable": false
+        },
+        {
+          "kind": "moved",
+          "origin": "user",
+          "at": "2026-10-01T10:05:00.000Z",
+          "noteId": "n2",
+          "journalId": "j1",
+          "title": "Standup",
+          "journalName": "Personal",
+          "batch": "B",
+          "detail": {
+            "from": "Work",
+            "to": "Personal"
+          },
+          "restorable": false
+        },
+        {
+          "kind": "tagged",
+          "origin": "user",
+          "at": "2026-10-01T10:00:00.000Z",
+          "noteId": "n3",
+          "journalId": "j2",
+          "title": "First real line of an untitled note",
+          "journalName": "Work",
+          "batch": "A",
+          "detail": {
+            "tags": [
+              "meeting"
+            ]
+          },
+          "restorable": false
+        }
+      ]
+    },
+    {
+      "name": "journal changes",
+      "library": {
+        "journals": [
+          {
+            "id": "j1",
+            "name": "Personal"
+          },
+          {
+            "id": "j2",
+            "name": "Work"
+          }
+        ],
+        "notes": [
+          {
+            "id": "n1",
+            "journalId": "j1",
+            "title": "Groceries",
+            "content": "milk\n",
+            "tags": [
+              "home"
+            ],
+            "createdAt": "2026-09-01T09:00:00.000Z",
+            "updatedAt": "2026-09-01T09:00:00.000Z"
+          },
+          {
+            "id": "n2",
+            "journalId": "j2",
+            "title": "Standup",
+            "content": "notes\n",
+            "tags": [
+              "meeting"
+            ],
+            "createdAt": "2026-09-01T09:00:00.000Z",
+            "updatedAt": "2026-09-01T09:00:00.000Z"
+          },
+          {
+            "id": "n3",
+            "journalId": "j2",
+            "title": null,
+            "content": "\n\nFirst real line of an untitled note\nsecond\n",
+            "tags": [],
+            "createdAt": "2026-09-01T09:00:00.000Z",
+            "updatedAt": "2026-09-01T09:00:00.000Z"
+          }
+        ]
+      },
+      "steps": [
+        {
+          "at": "2026-10-01T10:00:00.000Z",
+          "op": "createJournal",
+          "id": "j3",
+          "name": "Travel"
+        },
+        {
+          "at": "2026-10-01T10:01:00.000Z",
+          "op": "renameJournal",
+          "id": "j3",
+          "name": "Trips"
+        },
+        {
+          "at": "2026-10-01T10:02:00.000Z",
+          "op": "archiveJournal",
+          "id": "j3",
+          "archived": true
+        },
+        {
+          "at": "2026-10-01T10:03:00.000Z",
+          "op": "archiveJournal",
+          "id": "j3",
+          "archived": false
+        },
+        {
+          "at": "2026-10-01T10:04:00.000Z",
+          "op": "archiveJournal",
+          "id": "j3",
+          "archived": false
+        }
+      ],
+      "expected": [
+        {
+          "kind": "journal.unarchived",
+          "origin": "user",
+          "at": "2026-10-01T10:03:00.000Z",
+          "noteId": null,
+          "journalId": "j3",
+          "title": null,
+          "journalName": "Trips",
+          "batch": null,
+          "detail": {},
+          "restorable": false
+        },
+        {
+          "kind": "journal.archived",
+          "origin": "user",
+          "at": "2026-10-01T10:02:00.000Z",
+          "noteId": null,
+          "journalId": "j3",
+          "title": null,
+          "journalName": "Trips",
+          "batch": null,
+          "detail": {},
+          "restorable": false
+        },
+        {
+          "kind": "journal.renamed",
+          "origin": "user",
+          "at": "2026-10-01T10:01:00.000Z",
+          "noteId": null,
+          "journalId": "j3",
+          "title": null,
+          "journalName": "Trips",
+          "batch": null,
+          "detail": {
+            "from": "Travel",
+            "to": "Trips"
+          },
+          "restorable": false
+        },
+        {
+          "kind": "journal.created",
+          "origin": "user",
+          "at": "2026-10-01T10:00:00.000Z",
+          "noteId": null,
+          "journalId": "j3",
+          "title": null,
+          "journalName": "Travel",
+          "batch": null,
+          "detail": {},
+          "restorable": false
+        }
+      ]
+    },
+    {
+      "name": "sync and import keep their origin",
+      "library": {
+        "journals": [
+          {
+            "id": "j1",
+            "name": "Personal"
+          },
+          {
+            "id": "j2",
+            "name": "Work"
+          }
+        ],
+        "notes": [
+          {
+            "id": "n1",
+            "journalId": "j1",
+            "title": "Groceries",
+            "content": "milk\n",
+            "tags": [
+              "home"
+            ],
+            "createdAt": "2026-09-01T09:00:00.000Z",
+            "updatedAt": "2026-09-01T09:00:00.000Z"
+          },
+          {
+            "id": "n2",
+            "journalId": "j2",
+            "title": "Standup",
+            "content": "notes\n",
+            "tags": [
+              "meeting"
+            ],
+            "createdAt": "2026-09-01T09:00:00.000Z",
+            "updatedAt": "2026-09-01T09:00:00.000Z"
+          },
+          {
+            "id": "n3",
+            "journalId": "j2",
+            "title": null,
+            "content": "\n\nFirst real line of an untitled note\nsecond\n",
+            "tags": [],
+            "createdAt": "2026-09-01T09:00:00.000Z",
+            "updatedAt": "2026-09-01T09:00:00.000Z"
+          }
+        ]
+      },
+      "steps": [
+        {
+          "at": "2026-10-01T10:00:00.000Z",
+          "op": "createNote",
+          "origin": "sync",
+          "id": "n7",
+          "journalId": "j1",
+          "title": "From the phone",
+          "content": "hi\n"
+        },
+        {
+          "at": "2026-10-01T10:01:00.000Z",
+          "op": "updateNote",
+          "origin": "sync",
+          "id": "n7",
+          "content": "hi there\n"
+        },
+        {
+          "at": "2026-10-01T10:02:00.000Z",
+          "op": "updateNote",
+          "id": "n7",
+          "content": "hi there!\n"
+        },
+        {
+          "at": "2026-10-01T10:03:00.000Z",
+          "op": "createNote",
+          "origin": "import",
+          "batch": "I",
+          "id": "n8",
+          "journalId": "j1",
+          "title": "Old note",
+          "content": "x\n"
+        },
+        {
+          "at": "2026-10-01T10:03:00.000Z",
+          "op": "updateNote",
+          "origin": "import",
+          "batch": "I",
+          "id": "n1",
+          "content": "milk and honey\n"
+        }
+      ],
+      "expected": [
+        {
+          "kind": "edited",
+          "origin": "import",
+          "at": "2026-10-01T10:03:00.000Z",
+          "noteId": "n1",
+          "journalId": "j1",
+          "title": "Groceries",
+          "journalName": "Personal",
+          "batch": "I",
+          "detail": {
+            "edits": 1
+          },
+          "restorable": false
+        },
+        {
+          "kind": "imported",
+          "origin": "import",
+          "at": "2026-10-01T10:03:00.000Z",
+          "noteId": "n8",
+          "journalId": "j1",
+          "title": "Old note",
+          "journalName": "Personal",
+          "batch": "I",
+          "detail": {},
+          "restorable": false
+        },
+        {
+          "kind": "edited",
+          "origin": "user",
+          "at": "2026-10-01T10:02:00.000Z",
+          "noteId": "n7",
+          "journalId": "j1",
+          "title": "From the phone",
+          "journalName": "Personal",
+          "batch": null,
+          "detail": {
+            "edits": 1
+          },
+          "restorable": false
+        },
+        {
+          "kind": "edited",
+          "origin": "sync",
+          "at": "2026-10-01T10:01:00.000Z",
+          "noteId": "n7",
+          "journalId": "j1",
+          "title": "From the phone",
+          "journalName": "Personal",
+          "batch": null,
+          "detail": {
+            "edits": 1
+          },
+          "restorable": false
+        },
+        {
+          "kind": "created",
+          "origin": "sync",
+          "at": "2026-10-01T10:00:00.000Z",
+          "noteId": "n7",
+          "journalId": "j1",
+          "title": "From the phone",
+          "journalName": "Personal",
+          "batch": null,
+          "detail": {},
+          "restorable": false
+        }
+      ]
+    },
+    {
+      "name": "only the newest rows are kept",
+      "limits": {
+        "rows": 3
+      },
+      "library": {
+        "journals": [
+          {
+            "id": "j1",
+            "name": "Personal"
+          },
+          {
+            "id": "j2",
+            "name": "Work"
+          }
+        ],
+        "notes": [
+          {
+            "id": "n1",
+            "journalId": "j1",
+            "title": "Groceries",
+            "content": "milk\n",
+            "tags": [
+              "home"
+            ],
+            "createdAt": "2026-09-01T09:00:00.000Z",
+            "updatedAt": "2026-09-01T09:00:00.000Z"
+          },
+          {
+            "id": "n2",
+            "journalId": "j2",
+            "title": "Standup",
+            "content": "notes\n",
+            "tags": [
+              "meeting"
+            ],
+            "createdAt": "2026-09-01T09:00:00.000Z",
+            "updatedAt": "2026-09-01T09:00:00.000Z"
+          },
+          {
+            "id": "n3",
+            "journalId": "j2",
+            "title": null,
+            "content": "\n\nFirst real line of an untitled note\nsecond\n",
+            "tags": [],
+            "createdAt": "2026-09-01T09:00:00.000Z",
+            "updatedAt": "2026-09-01T09:00:00.000Z"
+          }
+        ]
+      },
+      "steps": [
+        {
+          "at": "2026-10-01T10:01:00.000Z",
+          "op": "createNote",
+          "id": "a1",
+          "journalId": "j1",
+          "title": "A1",
+          "content": "x\n"
+        },
+        {
+          "at": "2026-10-01T10:02:00.000Z",
+          "op": "createNote",
+          "id": "a2",
+          "journalId": "j1",
+          "title": "A2",
+          "content": "x\n"
+        },
+        {
+          "at": "2026-10-01T10:03:00.000Z",
+          "op": "createNote",
+          "id": "a3",
+          "journalId": "j1",
+          "title": "A3",
+          "content": "x\n"
+        },
+        {
+          "at": "2026-10-01T10:04:00.000Z",
+          "op": "createNote",
+          "id": "a4",
+          "journalId": "j1",
+          "title": "A4",
+          "content": "x\n"
+        },
+        {
+          "at": "2026-10-01T10:05:00.000Z",
+          "op": "createNote",
+          "id": "a5",
+          "journalId": "j1",
+          "title": "A5",
+          "content": "x\n"
+        }
+      ],
+      "expected": [
+        {
+          "kind": "created",
+          "origin": "user",
+          "at": "2026-10-01T10:05:00.000Z",
+          "noteId": "a5",
+          "journalId": "j1",
+          "title": "A5",
+          "journalName": "Personal",
+          "batch": null,
+          "detail": {},
+          "restorable": false
+        },
+        {
+          "kind": "created",
+          "origin": "user",
+          "at": "2026-10-01T10:04:00.000Z",
+          "noteId": "a4",
+          "journalId": "j1",
+          "title": "A4",
+          "journalName": "Personal",
+          "batch": null,
+          "detail": {},
+          "restorable": false
+        },
+        {
+          "kind": "created",
+          "origin": "user",
+          "at": "2026-10-01T10:03:00.000Z",
+          "noteId": "a3",
+          "journalId": "j1",
+          "title": "A3",
+          "journalName": "Personal",
+          "batch": null,
+          "detail": {},
+          "restorable": false
+        }
+      ]
+    },
+    {
+      "name": "payloads expire after 30 days",
+      "library": {
+        "journals": [
+          {
+            "id": "j1",
+            "name": "Personal"
+          },
+          {
+            "id": "j2",
+            "name": "Work"
+          }
+        ],
+        "notes": [
+          {
+            "id": "n1",
+            "journalId": "j1",
+            "title": "Groceries",
+            "content": "milk\n",
+            "tags": [
+              "home"
+            ],
+            "createdAt": "2026-09-01T09:00:00.000Z",
+            "updatedAt": "2026-09-01T09:00:00.000Z"
+          },
+          {
+            "id": "n2",
+            "journalId": "j2",
+            "title": "Standup",
+            "content": "notes\n",
+            "tags": [
+              "meeting"
+            ],
+            "createdAt": "2026-09-01T09:00:00.000Z",
+            "updatedAt": "2026-09-01T09:00:00.000Z"
+          },
+          {
+            "id": "n3",
+            "journalId": "j2",
+            "title": null,
+            "content": "\n\nFirst real line of an untitled note\nsecond\n",
+            "tags": [],
+            "createdAt": "2026-09-01T09:00:00.000Z",
+            "updatedAt": "2026-09-01T09:00:00.000Z"
+          }
+        ]
+      },
+      "steps": [
+        {
+          "at": "2026-10-01T10:00:00.000Z",
+          "op": "deleteNote",
+          "id": "n1"
+        },
+        {
+          "at": "2026-10-31T09:59:00.000Z",
+          "op": "createNote",
+          "id": "b1",
+          "journalId": "j2",
+          "title": "B1",
+          "content": "x\n"
+        },
+        {
+          "at": "2026-10-31T10:01:00.000Z",
+          "op": "createNote",
+          "id": "b2",
+          "journalId": "j2",
+          "title": "B2",
+          "content": "x\n"
+        },
+        {
+          "at": "2026-10-31T10:02:00.000Z",
+          "op": "restore",
+          "error": "invalidInput",
+          "noteId": "n1"
+        }
+      ],
+      "expected": [
+        {
+          "kind": "created",
+          "origin": "user",
+          "at": "2026-10-31T10:01:00.000Z",
+          "noteId": "b2",
+          "journalId": "j2",
+          "title": "B2",
+          "journalName": "Work",
+          "batch": null,
+          "detail": {},
+          "restorable": false
+        },
+        {
+          "kind": "created",
+          "origin": "user",
+          "at": "2026-10-31T09:59:00.000Z",
+          "noteId": "b1",
+          "journalId": "j2",
+          "title": "B1",
+          "journalName": "Work",
+          "batch": null,
+          "detail": {},
+          "restorable": false
+        },
+        {
+          "kind": "deleted",
+          "origin": "user",
+          "at": "2026-10-01T10:00:00.000Z",
+          "noteId": "n1",
+          "journalId": "j1",
+          "title": "Groceries",
+          "journalName": "Personal",
+          "batch": null,
+          "detail": {},
+          "restorable": false
+        }
+      ]
+    },
+    {
+      "name": "payloads are capped by total size",
+      "limits": {
+        "payloadBytes": 900
+      },
+      "library": {
+        "journals": [
+          {
+            "id": "j1",
+            "name": "Personal"
+          },
+          {
+            "id": "j2",
+            "name": "Work"
+          }
+        ],
+        "notes": [
+          {
+            "id": "n1",
+            "journalId": "j1",
+            "title": "Groceries",
+            "content": "milk\n",
+            "tags": [
+              "home"
+            ],
+            "createdAt": "2026-09-01T09:00:00.000Z",
+            "updatedAt": "2026-09-01T09:00:00.000Z"
+          },
+          {
+            "id": "n2",
+            "journalId": "j2",
+            "title": "Standup",
+            "content": "notes\n",
+            "tags": [
+              "meeting"
+            ],
+            "createdAt": "2026-09-01T09:00:00.000Z",
+            "updatedAt": "2026-09-01T09:00:00.000Z"
+          },
+          {
+            "id": "n3",
+            "journalId": "j2",
+            "title": null,
+            "content": "\n\nFirst real line of an untitled note\nsecond\n",
+            "tags": [],
+            "createdAt": "2026-09-01T09:00:00.000Z",
+            "updatedAt": "2026-09-01T09:00:00.000Z"
+          },
+          {
+            "id": "p1",
+            "journalId": "j1",
+            "title": "P1",
+            "content": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\n",
+            "tags": [],
+            "createdAt": "2026-09-01T09:00:00.000Z",
+            "updatedAt": "2026-09-01T09:00:00.000Z"
+          },
+          {
+            "id": "p2",
+            "journalId": "j1",
+            "title": "P2",
+            "content": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\n",
+            "tags": [],
+            "createdAt": "2026-09-01T09:00:00.000Z",
+            "updatedAt": "2026-09-01T09:00:00.000Z"
+          }
+        ]
+      },
+      "steps": [
+        {
+          "at": "2026-10-01T10:00:00.000Z",
+          "op": "deleteNote",
+          "id": "p1"
+        },
+        {
+          "at": "2026-10-01T10:01:00.000Z",
+          "op": "deleteNote",
+          "id": "p2"
+        }
+      ],
+      "expected": [
+        {
+          "kind": "deleted",
+          "origin": "user",
+          "at": "2026-10-01T10:01:00.000Z",
+          "noteId": "p2",
+          "journalId": "j1",
+          "title": "P2",
+          "journalName": "Personal",
+          "batch": null,
+          "detail": {},
+          "restorable": true
+        },
+        {
+          "kind": "deleted",
+          "origin": "user",
+          "at": "2026-10-01T10:00:00.000Z",
+          "noteId": "p1",
+          "journalId": "j1",
+          "title": "P1",
+          "journalName": "Personal",
+          "batch": null,
+          "detail": {},
+          "restorable": false
+        }
+      ]
+    },
+    {
+      "name": "deleting permanently ends restore",
+      "library": {
+        "journals": [
+          {
+            "id": "j1",
+            "name": "Personal"
+          },
+          {
+            "id": "j2",
+            "name": "Work"
+          }
+        ],
+        "notes": [
+          {
+            "id": "n1",
+            "journalId": "j1",
+            "title": "Groceries",
+            "content": "milk\n",
+            "tags": [
+              "home"
+            ],
+            "createdAt": "2026-09-01T09:00:00.000Z",
+            "updatedAt": "2026-09-01T09:00:00.000Z"
+          },
+          {
+            "id": "n2",
+            "journalId": "j2",
+            "title": "Standup",
+            "content": "notes\n",
+            "tags": [
+              "meeting"
+            ],
+            "createdAt": "2026-09-01T09:00:00.000Z",
+            "updatedAt": "2026-09-01T09:00:00.000Z"
+          },
+          {
+            "id": "n3",
+            "journalId": "j2",
+            "title": null,
+            "content": "\n\nFirst real line of an untitled note\nsecond\n",
+            "tags": [],
+            "createdAt": "2026-09-01T09:00:00.000Z",
+            "updatedAt": "2026-09-01T09:00:00.000Z"
+          }
+        ]
+      },
+      "steps": [
+        {
+          "at": "2026-10-01T10:00:00.000Z",
+          "op": "deleteNote",
+          "id": "n1"
+        },
+        {
+          "at": "2026-10-01T10:01:00.000Z",
+          "op": "purge",
+          "noteId": "n1"
+        },
+        {
+          "at": "2026-10-01T10:02:00.000Z",
+          "op": "restore",
+          "error": "invalidInput",
+          "noteId": "n1"
+        },
+        {
+          "at": "2026-10-01T10:03:00.000Z",
+          "op": "restore",
+          "error": "notFound",
+          "noteId": "n2"
+        }
+      ],
+      "expected": [
+        {
+          "kind": "deleted",
+          "origin": "user",
+          "at": "2026-10-01T10:00:00.000Z",
+          "noteId": "n1",
+          "journalId": "j1",
+          "title": "Groceries",
+          "journalName": "Personal",
+          "batch": null,
+          "detail": {},
+          "restorable": false
+        }
+      ]
+    },
+    {
+      "name": "clearing drops every row",
+      "library": {
+        "journals": [
+          {
+            "id": "j1",
+            "name": "Personal"
+          },
+          {
+            "id": "j2",
+            "name": "Work"
+          }
+        ],
+        "notes": [
+          {
+            "id": "n1",
+            "journalId": "j1",
+            "title": "Groceries",
+            "content": "milk\n",
+            "tags": [
+              "home"
+            ],
+            "createdAt": "2026-09-01T09:00:00.000Z",
+            "updatedAt": "2026-09-01T09:00:00.000Z"
+          },
+          {
+            "id": "n2",
+            "journalId": "j2",
+            "title": "Standup",
+            "content": "notes\n",
+            "tags": [
+              "meeting"
+            ],
+            "createdAt": "2026-09-01T09:00:00.000Z",
+            "updatedAt": "2026-09-01T09:00:00.000Z"
+          },
+          {
+            "id": "n3",
+            "journalId": "j2",
+            "title": null,
+            "content": "\n\nFirst real line of an untitled note\nsecond\n",
+            "tags": [],
+            "createdAt": "2026-09-01T09:00:00.000Z",
+            "updatedAt": "2026-09-01T09:00:00.000Z"
+          }
+        ]
+      },
+      "steps": [
+        {
+          "at": "2026-10-01T10:00:00.000Z",
+          "op": "deleteNote",
+          "id": "n1"
+        },
+        {
+          "at": "2026-10-01T10:01:00.000Z",
+          "op": "clear"
+        },
+        {
+          "at": "2026-10-01T10:02:00.000Z",
+          "op": "updateNote",
+          "id": "n2",
+          "content": "notes, later\n"
+        }
+      ],
+      "expected": [
+        {
+          "kind": "edited",
+          "origin": "user",
+          "at": "2026-10-01T10:02:00.000Z",
+          "noteId": "n2",
+          "journalId": "j2",
+          "title": "Standup",
+          "journalName": "Work",
+          "batch": null,
+          "detail": {
+            "edits": 1
+          },
+          "restorable": false
+        }
+      ]
+    }
+  ]
+}

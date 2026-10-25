@@ -76,7 +76,8 @@ written. Revisions give equality, not order. **[now]**
 `{id, kind: "note" | "journal", deletedAt, lastRevision?}`. Deleting removes
 all content, tags, derived rows, and search entries; the tombstone lets
 another device learn of the delete. Deleting a journal tombstones it and every
-note in it. Re-creating an ID (e.g. by import) removes its tombstone. Exports
+note in it. Re-creating an ID (e.g. by import, or restoring from the activity log,
+[activity.md](activity.md)) removes its tombstone. Exports
 do not carry tombstones yet; compaction is defined with sync. **[now]**
 
 ## Reference grammar
