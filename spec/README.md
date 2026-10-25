@@ -16,6 +16,7 @@ Node code.
 | [notes-client.md](notes-client.md)   | The NotesClient API contract and its fixtures                     |
 | [publish.md](publish.md)             | Projecting a note into a public bundle (a blog post)              |
 | [theme.md](theme.md)                 | Theme files: colors, note typography, and how overrides resolve   |
+| [sync.md](sync.md)                   | Records, change detection, and merge rules for syncing devices    |
 | `vectors/`                           | Golden inputs and expected outputs                                |
 
 ## Status
@@ -38,6 +39,7 @@ vectors/
   publish/<case>/input.json  library state plus the note, target, and published map
   publish/<case>/expected/   the bundle tree (absent for an expectedError case)
   theme/cases.json           theme file in → resolved variants and typography, or error paths
+  sync/<area>.json           multi-device scenarios over one server (see sync.md)
 ```
 
 An implementation passes a vector when:
@@ -61,8 +63,9 @@ An implementation passes a vector when:
   fails with `expectedError` (see [publish.md](publish.md#vectors)).
 - **theme:** reading each case's `input` yields `expected` (see
   [theme.md](theme.md#vectors)).
+- **sync:** every scenario passes (see [sync.md](sync.md#vectors)).
 
-In this repo, `yarn test:node` runs every vector except `theme/`
+In this repo, `yarn test:node` runs every vector except `theme/` and `sync/`
 (`src/node-client/spec-vectors.test.ts`); the Swift app runs those. To regenerate after an intentional
 change:
 

@@ -1,0 +1,588 @@
+{
+  "description": "Journals across devices: renames, archiving, name collisions, deletes.",
+  "scenarios": [
+    {
+      "name": "a rename reaches the other device",
+      "devices": {
+        "a": "basic",
+        "b": null
+      },
+      "steps": [
+        {
+          "sync": "a"
+        },
+        {
+          "sync": "b"
+        },
+        {
+          "device": "a",
+          "op": "renameJournal",
+          "request": {
+            "id": "03aq5qh9copxys3mzz5l8q60f",
+            "name": "office"
+          },
+          "response": {
+            "id": "03aq5qh9copxys3mzz5l8q60f",
+            "name": "office",
+            "archived": false,
+            "noteCount": 2
+          }
+        },
+        {
+          "sync": "a"
+        },
+        {
+          "sync": "b"
+        },
+        {
+          "device": "b",
+          "op": "listJournals",
+          "response": {
+            "journals": [
+              {
+                "id": "03aq5qh9copxys3mzz5l8q60f",
+                "name": "office",
+                "archived": false,
+                "noteCount": 2
+              },
+              {
+                "id": "03aqdjryx3t7dd9h7lezzx83o",
+                "name": "personal",
+                "archived": false,
+                "noteCount": 1
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "archiving reaches the other device",
+      "devices": {
+        "a": "basic",
+        "b": null
+      },
+      "steps": [
+        {
+          "sync": "a"
+        },
+        {
+          "sync": "b"
+        },
+        {
+          "device": "a",
+          "op": "setJournalArchived",
+          "request": {
+            "id": "03aqdjryx3t7dd9h7lezzx83o",
+            "archived": true
+          },
+          "response": {
+            "id": "03aqdjryx3t7dd9h7lezzx83o",
+            "name": "personal",
+            "archived": true,
+            "noteCount": 1
+          }
+        },
+        {
+          "sync": "a"
+        },
+        {
+          "sync": "b"
+        },
+        {
+          "device": "b",
+          "op": "listJournals",
+          "response": {
+            "journals": [
+              {
+                "id": "03aqdjryx3t7dd9h7lezzx83o",
+                "name": "personal",
+                "archived": true,
+                "noteCount": 1
+              },
+              {
+                "id": "03aq5qh9copxys3mzz5l8q60f",
+                "name": "work",
+                "archived": false,
+                "noteCount": 2
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "a rename on one device and archiving on another merge",
+      "devices": {
+        "a": "basic",
+        "b": null
+      },
+      "steps": [
+        {
+          "sync": "a"
+        },
+        {
+          "sync": "b"
+        },
+        {
+          "device": "a",
+          "op": "renameJournal",
+          "request": {
+            "id": "03aqdjryx3t7dd9h7lezzx83o",
+            "name": "home"
+          },
+          "response": {
+            "id": "03aqdjryx3t7dd9h7lezzx83o",
+            "name": "home",
+            "archived": false,
+            "noteCount": 1
+          }
+        },
+        {
+          "device": "b",
+          "op": "setJournalArchived",
+          "request": {
+            "id": "03aqdjryx3t7dd9h7lezzx83o",
+            "archived": true
+          },
+          "response": {
+            "id": "03aqdjryx3t7dd9h7lezzx83o",
+            "name": "personal",
+            "archived": true,
+            "noteCount": 1
+          }
+        },
+        {
+          "sync": "a"
+        },
+        {
+          "sync": "b"
+        },
+        {
+          "sync": "a"
+        },
+        {
+          "device": "a",
+          "op": "listJournals",
+          "response": {
+            "journals": [
+              {
+                "id": "03aqdjryx3t7dd9h7lezzx83o",
+                "name": "home",
+                "archived": true,
+                "noteCount": 1
+              },
+              {
+                "id": "03aq5qh9copxys3mzz5l8q60f",
+                "name": "work",
+                "archived": false,
+                "noteCount": 2
+              }
+            ]
+          }
+        },
+        {
+          "device": "b",
+          "op": "listJournals",
+          "response": {
+            "journals": [
+              {
+                "id": "03aqdjryx3t7dd9h7lezzx83o",
+                "name": "home",
+                "archived": true,
+                "noteCount": 1
+              },
+              {
+                "id": "03aq5qh9copxys3mzz5l8q60f",
+                "name": "work",
+                "archived": false,
+                "noteCount": 2
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "the same name created on two devices: one is renamed, on both",
+      "devices": {
+        "a": "basic",
+        "b": null
+      },
+      "steps": [
+        {
+          "sync": "a"
+        },
+        {
+          "sync": "b"
+        },
+        {
+          "device": "a",
+          "op": "createJournal",
+          "request": {
+            "name": "trips"
+          },
+          "response": {
+            "id": "$any",
+            "name": "trips",
+            "archived": false,
+            "noteCount": 0
+          }
+        },
+        {
+          "device": "b",
+          "op": "createJournal",
+          "request": {
+            "name": "Trips"
+          },
+          "response": {
+            "id": "$any",
+            "name": "Trips",
+            "archived": false,
+            "noteCount": 0
+          }
+        },
+        {
+          "sync": "a"
+        },
+        {
+          "sync": "b"
+        },
+        {
+          "sync": "a"
+        },
+        {
+          "device": "a",
+          "op": "listJournals",
+          "response": {
+            "journals": [
+              {
+                "id": "$capture:t1",
+                "name": "$capture:n1",
+                "archived": false,
+                "noteCount": 0
+              },
+              {
+                "id": "03aqdjryx3t7dd9h7lezzx83o",
+                "name": "personal",
+                "archived": false,
+                "noteCount": 1
+              },
+              {
+                "id": "$capture:t2",
+                "name": "$capture:n2",
+                "archived": false,
+                "noteCount": 0
+              },
+              {
+                "id": "03aq5qh9copxys3mzz5l8q60f",
+                "name": "work",
+                "archived": false,
+                "noteCount": 2
+              }
+            ]
+          }
+        },
+        {
+          "device": "b",
+          "op": "listJournals",
+          "response": {
+            "journals": [
+              {
+                "id": "$ref:t1",
+                "name": "$ref:n1",
+                "archived": false,
+                "noteCount": 0
+              },
+              {
+                "id": "03aqdjryx3t7dd9h7lezzx83o",
+                "name": "personal",
+                "archived": false,
+                "noteCount": 1
+              },
+              {
+                "id": "$ref:t2",
+                "name": "$ref:n2",
+                "archived": false,
+                "noteCount": 0
+              },
+              {
+                "id": "03aq5qh9copxys3mzz5l8q60f",
+                "name": "work",
+                "archived": false,
+                "noteCount": 2
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "a deleted journal reaches the other device with its notes",
+      "devices": {
+        "a": "basic",
+        "b": null
+      },
+      "steps": [
+        {
+          "sync": "a"
+        },
+        {
+          "sync": "b"
+        },
+        {
+          "device": "a",
+          "op": "deleteJournal",
+          "request": {
+            "id": "03aqdjryx3t7dd9h7lezzx83o"
+          }
+        },
+        {
+          "sync": "a"
+        },
+        {
+          "sync": "b"
+        },
+        {
+          "device": "b",
+          "op": "listJournals",
+          "response": {
+            "journals": [
+              {
+                "id": "03aq5qh9copxys3mzz5l8q60f",
+                "name": "work",
+                "archived": false,
+                "noteCount": 2
+              }
+            ]
+          }
+        },
+        {
+          "device": "b",
+          "op": "getNote",
+          "request": {
+            "id": "03b3m6xaiod1fz6mvkjmvb3jc"
+          },
+          "error": {
+            "code": "not_found"
+          }
+        }
+      ]
+    },
+    {
+      "name": "a journal deleted while another device added a note to it survives with that note",
+      "devices": {
+        "a": "basic",
+        "b": null
+      },
+      "steps": [
+        {
+          "sync": "a"
+        },
+        {
+          "sync": "b"
+        },
+        {
+          "device": "a",
+          "op": "deleteJournal",
+          "request": {
+            "id": "03aqdjryx3t7dd9h7lezzx83o"
+          }
+        },
+        {
+          "device": "b",
+          "op": "createNote",
+          "request": {
+            "journalId": "03aqdjryx3t7dd9h7lezzx83o",
+            "title": "Written offline",
+            "content": "Kept.\n",
+            "createdAt": "2024-05-01T00:00:00.000Z"
+          },
+          "response": {
+            "id": "$capture:kept",
+            "revision": "$any"
+          }
+        },
+        {
+          "sync": "a"
+        },
+        {
+          "sync": "b"
+        },
+        {
+          "sync": "a"
+        },
+        {
+          "device": "a",
+          "op": "listJournals",
+          "response": {
+            "journals": [
+              {
+                "id": "03aqdjryx3t7dd9h7lezzx83o",
+                "name": "personal",
+                "archived": false,
+                "noteCount": 1
+              },
+              {
+                "id": "03aq5qh9copxys3mzz5l8q60f",
+                "name": "work",
+                "archived": false,
+                "noteCount": 2
+              }
+            ]
+          }
+        },
+        {
+          "device": "b",
+          "op": "listJournals",
+          "response": {
+            "journals": [
+              {
+                "id": "03aqdjryx3t7dd9h7lezzx83o",
+                "name": "personal",
+                "archived": false,
+                "noteCount": 1
+              },
+              {
+                "id": "03aq5qh9copxys3mzz5l8q60f",
+                "name": "work",
+                "archived": false,
+                "noteCount": 2
+              }
+            ]
+          }
+        },
+        {
+          "device": "a",
+          "op": "getNote",
+          "request": {
+            "id": "03b3m6xaiod1fz6mvkjmvb3jc"
+          },
+          "error": {
+            "code": "not_found"
+          }
+        },
+        {
+          "device": "b",
+          "op": "getNote",
+          "request": {
+            "id": "03b3m6xaiod1fz6mvkjmvb3jc"
+          },
+          "error": {
+            "code": "not_found"
+          }
+        },
+        {
+          "device": "a",
+          "op": "searchNotes",
+          "request": {
+            "journalIds": [
+              "03aqdjryx3t7dd9h7lezzx83o"
+            ]
+          },
+          "response": {
+            "items": [
+              {
+                "id": "$ref:kept",
+                "journalId": "03aqdjryx3t7dd9h7lezzx83o",
+                "title": "Written offline",
+                "createdAt": "2024-05-01T00:00:00.000Z"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "a note moved into a journal deleted elsewhere brings the journal back",
+      "devices": {
+        "a": "basic",
+        "b": null
+      },
+      "steps": [
+        {
+          "sync": "a"
+        },
+        {
+          "sync": "b"
+        },
+        {
+          "device": "a",
+          "op": "deleteJournal",
+          "request": {
+            "id": "03aqdjryx3t7dd9h7lezzx83o"
+          }
+        },
+        {
+          "device": "b",
+          "op": "bulkUpdate",
+          "request": {
+            "query": {
+              "titles": [
+                "Gamma"
+              ]
+            },
+            "op": {
+              "type": "change_journal",
+              "journalId": "03aqdjryx3t7dd9h7lezzx83o"
+            }
+          },
+          "response": {
+            "matched": 1,
+            "updated": 1,
+            "failed": []
+          }
+        },
+        {
+          "sync": "a"
+        },
+        {
+          "sync": "b"
+        },
+        {
+          "sync": "a"
+        },
+        {
+          "device": "a",
+          "op": "listJournals",
+          "response": {
+            "journals": [
+              {
+                "id": "03aqdjryx3t7dd9h7lezzx83o",
+                "name": "personal",
+                "archived": false,
+                "noteCount": 1
+              },
+              {
+                "id": "03aq5qh9copxys3mzz5l8q60f",
+                "name": "work",
+                "archived": false,
+                "noteCount": 1
+              }
+            ]
+          }
+        },
+        {
+          "device": "b",
+          "op": "listJournals",
+          "response": {
+            "journals": [
+              {
+                "id": "03aqdjryx3t7dd9h7lezzx83o",
+                "name": "personal",
+                "archived": false,
+                "noteCount": 1
+              },
+              {
+                "id": "03aq5qh9copxys3mzz5l8q60f",
+                "name": "work",
+                "archived": false,
+                "noteCount": 1
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

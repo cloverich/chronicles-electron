@@ -1,0 +1,1041 @@
+{
+  "description": "Notes across devices: first sync, edits, merges, conflicted copies, deletes.",
+  "scenarios": [
+    {
+      "name": "a new device receives the library",
+      "devices": {
+        "a": "basic",
+        "b": null
+      },
+      "steps": [
+        {
+          "sync": "a"
+        },
+        {
+          "sync": "b"
+        },
+        {
+          "device": "b",
+          "op": "getNote",
+          "request": {
+            "id": "03awvyp9xobkv9t1jmmtiz0bp"
+          },
+          "response": {
+            "id": "03awvyp9xobkv9t1jmmtiz0bp",
+            "journalId": "03aq5qh9copxys3mzz5l8q60f",
+            "title": "Alpha meeting",
+            "content": "Discussed the roadmap with [Beta](chronicles://note/03b3m6xaiod1fz6mvkjmvb3jc).\n",
+            "tags": [
+              "meeting",
+              "work"
+            ],
+            "createdAt": "2024-01-10T09:00:00.000Z",
+            "updatedAt": "2024-01-10T10:00:00.000Z",
+            "frontMatter": {},
+            "revision": "12fc46846ebfdb5bc670cde2287a4a5550fb093b8b790a0385b4b2884d89dd4c"
+          }
+        },
+        {
+          "device": "b",
+          "op": "listJournals",
+          "response": {
+            "journals": [
+              {
+                "id": "03aqdjryx3t7dd9h7lezzx83o",
+                "name": "personal",
+                "archived": false,
+                "noteCount": 1
+              },
+              {
+                "id": "03aq5qh9copxys3mzz5l8q60f",
+                "name": "work",
+                "archived": false,
+                "noteCount": 2
+              }
+            ]
+          }
+        },
+        {
+          "device": "b",
+          "op": "countNotes",
+          "request": {},
+          "response": {
+            "count": 3
+          }
+        }
+      ]
+    },
+    {
+      "name": "two devices with the same library match without copies",
+      "devices": {
+        "a": "basic",
+        "b": "basic"
+      },
+      "steps": [
+        {
+          "sync": "a"
+        },
+        {
+          "sync": "b"
+        },
+        {
+          "sync": "a"
+        },
+        {
+          "device": "a",
+          "op": "countNotes",
+          "request": {},
+          "response": {
+            "count": 3
+          }
+        },
+        {
+          "device": "b",
+          "op": "countNotes",
+          "request": {},
+          "response": {
+            "count": 3
+          }
+        },
+        {
+          "device": "b",
+          "op": "getNote",
+          "request": {
+            "id": "03awvyp9xobkv9t1jmmtiz0bp"
+          },
+          "response": {
+            "id": "03awvyp9xobkv9t1jmmtiz0bp",
+            "journalId": "03aq5qh9copxys3mzz5l8q60f",
+            "title": "Alpha meeting",
+            "content": "Discussed the roadmap with [Beta](chronicles://note/03b3m6xaiod1fz6mvkjmvb3jc).\n",
+            "tags": [
+              "meeting",
+              "work"
+            ],
+            "createdAt": "2024-01-10T09:00:00.000Z",
+            "updatedAt": "2024-01-10T10:00:00.000Z",
+            "frontMatter": {},
+            "revision": "12fc46846ebfdb5bc670cde2287a4a5550fb093b8b790a0385b4b2884d89dd4c"
+          }
+        }
+      ]
+    },
+    {
+      "name": "an edit reaches the other device",
+      "devices": {
+        "a": "basic",
+        "b": null
+      },
+      "steps": [
+        {
+          "sync": "a"
+        },
+        {
+          "sync": "b"
+        },
+        {
+          "device": "a",
+          "op": "updateNote",
+          "request": {
+            "id": "03b9wsjvyu3t3ufq044kfzgru",
+            "journalId": "03aq5qh9copxys3mzz5l8q60f",
+            "title": "Gamma",
+            "content": "Roadmap follow-up, revised.\n",
+            "tags": [],
+            "frontMatter": {
+              "source": "fixture",
+              "priority": 2
+            },
+            "updatedAt": "2024-04-01T00:00:00.000Z"
+          },
+          "response": {
+            "id": "03b9wsjvyu3t3ufq044kfzgru",
+            "revision": "$any"
+          }
+        },
+        {
+          "sync": "a"
+        },
+        {
+          "sync": "b"
+        },
+        {
+          "device": "b",
+          "op": "getNote",
+          "request": {
+            "id": "03b9wsjvyu3t3ufq044kfzgru"
+          },
+          "response": {
+            "id": "03b9wsjvyu3t3ufq044kfzgru",
+            "journalId": "03aq5qh9copxys3mzz5l8q60f",
+            "title": "Gamma",
+            "content": "Roadmap follow-up, revised.\n",
+            "tags": [],
+            "createdAt": "2024-03-05T09:00:00.000Z",
+            "updatedAt": "2024-04-01T00:00:00.000Z",
+            "frontMatter": {
+              "source": "fixture",
+              "priority": 2
+            },
+            "revision": "$any"
+          }
+        }
+      ]
+    },
+    {
+      "name": "a new note reaches the other device",
+      "devices": {
+        "a": "basic",
+        "b": null
+      },
+      "steps": [
+        {
+          "sync": "a"
+        },
+        {
+          "sync": "b"
+        },
+        {
+          "device": "a",
+          "op": "createNote",
+          "request": {
+            "journalId": "03aqdjryx3t7dd9h7lezzx83o",
+            "title": "Delta",
+            "content": "New note.\n",
+            "tags": [
+              "b",
+              "a"
+            ],
+            "createdAt": "2024-05-01T00:00:00.000Z"
+          },
+          "response": {
+            "id": "$capture:delta",
+            "revision": "$capture:rd"
+          }
+        },
+        {
+          "sync": "a"
+        },
+        {
+          "sync": "b"
+        },
+        {
+          "device": "b",
+          "op": "getNote",
+          "request": {
+            "id": "$ref:delta"
+          },
+          "response": {
+            "id": "$ref:delta",
+            "journalId": "03aqdjryx3t7dd9h7lezzx83o",
+            "title": "Delta",
+            "content": "New note.\n",
+            "tags": [
+              "a",
+              "b"
+            ],
+            "createdAt": "2024-05-01T00:00:00.000Z",
+            "updatedAt": "2024-05-01T00:00:00.000Z",
+            "frontMatter": {},
+            "revision": "$ref:rd"
+          }
+        }
+      ]
+    },
+    {
+      "name": "edits to different fields merge",
+      "devices": {
+        "a": "basic",
+        "b": null
+      },
+      "steps": [
+        {
+          "sync": "a"
+        },
+        {
+          "sync": "b"
+        },
+        {
+          "device": "a",
+          "op": "updateNote",
+          "request": {
+            "id": "03b9wsjvyu3t3ufq044kfzgru",
+            "journalId": "03aq5qh9copxys3mzz5l8q60f",
+            "title": "Gamma, renamed",
+            "content": "Roadmap follow-up.\n",
+            "tags": [
+              "x"
+            ],
+            "frontMatter": {
+              "source": "fixture",
+              "priority": 2
+            },
+            "updatedAt": "2024-04-01T00:00:00.000Z"
+          },
+          "response": {
+            "id": "03b9wsjvyu3t3ufq044kfzgru",
+            "revision": "$any"
+          }
+        },
+        {
+          "device": "b",
+          "op": "updateNote",
+          "request": {
+            "id": "03b9wsjvyu3t3ufq044kfzgru",
+            "journalId": "03aq5qh9copxys3mzz5l8q60f",
+            "title": "Gamma",
+            "content": "Roadmap follow-up, from b.\n",
+            "tags": [
+              "y"
+            ],
+            "frontMatter": {
+              "source": "fixture",
+              "priority": 3
+            },
+            "updatedAt": "2024-04-02T00:00:00.000Z"
+          },
+          "response": {
+            "id": "03b9wsjvyu3t3ufq044kfzgru",
+            "revision": "$any"
+          }
+        },
+        {
+          "sync": "a"
+        },
+        {
+          "sync": "b"
+        },
+        {
+          "sync": "a"
+        },
+        {
+          "device": "a",
+          "op": "getNote",
+          "request": {
+            "id": "03b9wsjvyu3t3ufq044kfzgru"
+          },
+          "response": {
+            "id": "03b9wsjvyu3t3ufq044kfzgru",
+            "journalId": "03aq5qh9copxys3mzz5l8q60f",
+            "title": "Gamma, renamed",
+            "content": "Roadmap follow-up, from b.\n",
+            "tags": [
+              "x",
+              "y"
+            ],
+            "createdAt": "2024-03-05T09:00:00.000Z",
+            "updatedAt": "2024-04-02T00:00:00.000Z",
+            "frontMatter": {
+              "source": "fixture",
+              "priority": 3
+            },
+            "revision": "$any"
+          }
+        },
+        {
+          "device": "b",
+          "op": "getNote",
+          "request": {
+            "id": "03b9wsjvyu3t3ufq044kfzgru"
+          },
+          "response": {
+            "id": "03b9wsjvyu3t3ufq044kfzgru",
+            "journalId": "03aq5qh9copxys3mzz5l8q60f",
+            "title": "Gamma, renamed",
+            "content": "Roadmap follow-up, from b.\n",
+            "tags": [
+              "x",
+              "y"
+            ],
+            "createdAt": "2024-03-05T09:00:00.000Z",
+            "updatedAt": "2024-04-02T00:00:00.000Z",
+            "frontMatter": {
+              "source": "fixture",
+              "priority": 3
+            },
+            "revision": "$any"
+          }
+        },
+        {
+          "device": "a",
+          "op": "searchNotes",
+          "request": {
+            "titles": [
+              "conflicted copy"
+            ]
+          },
+          "response": {
+            "items": []
+          }
+        }
+      ]
+    },
+    {
+      "name": "a tag removed on one device and another added elsewhere",
+      "devices": {
+        "a": "basic",
+        "b": null
+      },
+      "steps": [
+        {
+          "sync": "a"
+        },
+        {
+          "sync": "b"
+        },
+        {
+          "device": "a",
+          "op": "updateNote",
+          "request": {
+            "id": "03awvyp9xobkv9t1jmmtiz0bp",
+            "journalId": "03aq5qh9copxys3mzz5l8q60f",
+            "title": "Alpha meeting",
+            "content": "Discussed the roadmap with [Beta](chronicles://note/03b3m6xaiod1fz6mvkjmvb3jc).\n",
+            "tags": [
+              "meeting"
+            ],
+            "updatedAt": "2024-04-01T00:00:00.000Z"
+          },
+          "response": {
+            "id": "03awvyp9xobkv9t1jmmtiz0bp",
+            "revision": "$any"
+          }
+        },
+        {
+          "device": "b",
+          "op": "bulkUpdate",
+          "request": {
+            "query": {
+              "tags": [
+                "work"
+              ]
+            },
+            "op": {
+              "type": "add_tag",
+              "tag": "q1"
+            }
+          },
+          "response": {
+            "matched": 1,
+            "updated": 1,
+            "failed": []
+          }
+        },
+        {
+          "sync": "a"
+        },
+        {
+          "sync": "b"
+        },
+        {
+          "sync": "a"
+        },
+        {
+          "device": "a",
+          "op": "getNote",
+          "request": {
+            "id": "03awvyp9xobkv9t1jmmtiz0bp"
+          },
+          "response": {
+            "id": "03awvyp9xobkv9t1jmmtiz0bp",
+            "journalId": "03aq5qh9copxys3mzz5l8q60f",
+            "title": "Alpha meeting",
+            "content": "Discussed the roadmap with [Beta](chronicles://note/03b3m6xaiod1fz6mvkjmvb3jc).\n",
+            "tags": [
+              "meeting",
+              "q1"
+            ],
+            "createdAt": "2024-01-10T09:00:00.000Z",
+            "updatedAt": "$any",
+            "frontMatter": {},
+            "revision": "$capture:ra"
+          }
+        },
+        {
+          "device": "b",
+          "op": "getNote",
+          "request": {
+            "id": "03awvyp9xobkv9t1jmmtiz0bp"
+          },
+          "response": {
+            "id": "03awvyp9xobkv9t1jmmtiz0bp",
+            "journalId": "03aq5qh9copxys3mzz5l8q60f",
+            "title": "Alpha meeting",
+            "content": "Discussed the roadmap with [Beta](chronicles://note/03b3m6xaiod1fz6mvkjmvb3jc).\n",
+            "tags": [
+              "meeting",
+              "q1"
+            ],
+            "createdAt": "2024-01-10T09:00:00.000Z",
+            "updatedAt": "$any",
+            "frontMatter": {},
+            "revision": "$ref:ra"
+          }
+        }
+      ]
+    },
+    {
+      "name": "a move on one device and an edit on another merge",
+      "devices": {
+        "a": "basic",
+        "b": null
+      },
+      "steps": [
+        {
+          "sync": "a"
+        },
+        {
+          "sync": "b"
+        },
+        {
+          "device": "a",
+          "op": "bulkUpdate",
+          "request": {
+            "query": {
+              "titles": [
+                "Gamma"
+              ]
+            },
+            "op": {
+              "type": "change_journal",
+              "journalId": "03aqdjryx3t7dd9h7lezzx83o"
+            }
+          },
+          "response": {
+            "matched": 1,
+            "updated": 1,
+            "failed": []
+          }
+        },
+        {
+          "device": "b",
+          "op": "updateNote",
+          "request": {
+            "id": "03b9wsjvyu3t3ufq044kfzgru",
+            "journalId": "03aq5qh9copxys3mzz5l8q60f",
+            "title": "Gamma",
+            "content": "Edited while it moved.\n",
+            "tags": [],
+            "frontMatter": {
+              "source": "fixture",
+              "priority": 2
+            },
+            "updatedAt": "2024-04-02T00:00:00.000Z"
+          },
+          "response": {
+            "id": "03b9wsjvyu3t3ufq044kfzgru",
+            "revision": "$any"
+          }
+        },
+        {
+          "sync": "a"
+        },
+        {
+          "sync": "b"
+        },
+        {
+          "sync": "a"
+        },
+        {
+          "device": "a",
+          "op": "getNote",
+          "request": {
+            "id": "03b9wsjvyu3t3ufq044kfzgru"
+          },
+          "response": {
+            "id": "03b9wsjvyu3t3ufq044kfzgru",
+            "journalId": "03aqdjryx3t7dd9h7lezzx83o",
+            "title": "Gamma",
+            "content": "Edited while it moved.\n",
+            "tags": [],
+            "createdAt": "2024-03-05T09:00:00.000Z",
+            "updatedAt": "$any",
+            "frontMatter": {
+              "source": "fixture",
+              "priority": 2
+            },
+            "revision": "$any"
+          }
+        },
+        {
+          "device": "b",
+          "op": "getNote",
+          "request": {
+            "id": "03b9wsjvyu3t3ufq044kfzgru"
+          },
+          "response": {
+            "id": "03b9wsjvyu3t3ufq044kfzgru",
+            "journalId": "03aqdjryx3t7dd9h7lezzx83o",
+            "title": "Gamma",
+            "content": "Edited while it moved.\n",
+            "tags": [],
+            "createdAt": "2024-03-05T09:00:00.000Z",
+            "updatedAt": "$any",
+            "frontMatter": {
+              "source": "fixture",
+              "priority": 2
+            },
+            "revision": "$any"
+          }
+        }
+      ]
+    },
+    {
+      "name": "both devices edit the text: the first to sync keeps the note, the other gets a conflicted copy",
+      "devices": {
+        "a": "basic",
+        "b": null
+      },
+      "steps": [
+        {
+          "sync": "a"
+        },
+        {
+          "sync": "b"
+        },
+        {
+          "device": "a",
+          "op": "updateNote",
+          "request": {
+            "id": "03b9wsjvyu3t3ufq044kfzgru",
+            "journalId": "03aq5qh9copxys3mzz5l8q60f",
+            "title": "Gamma",
+            "content": "Written on a.\n",
+            "tags": [],
+            "frontMatter": {
+              "source": "fixture",
+              "priority": 2
+            },
+            "updatedAt": "2024-04-01T00:00:00.000Z"
+          },
+          "response": {
+            "id": "03b9wsjvyu3t3ufq044kfzgru",
+            "revision": "$any"
+          }
+        },
+        {
+          "device": "b",
+          "op": "updateNote",
+          "request": {
+            "id": "03b9wsjvyu3t3ufq044kfzgru",
+            "journalId": "03aq5qh9copxys3mzz5l8q60f",
+            "title": "Gamma",
+            "content": "Written on b.\n",
+            "tags": [
+              "b"
+            ],
+            "frontMatter": {
+              "source": "fixture",
+              "priority": 2
+            },
+            "updatedAt": "2024-04-02T00:00:00.000Z"
+          },
+          "response": {
+            "id": "03b9wsjvyu3t3ufq044kfzgru",
+            "revision": "$any"
+          }
+        },
+        {
+          "sync": "a"
+        },
+        {
+          "sync": "b"
+        },
+        {
+          "sync": "a"
+        },
+        {
+          "device": "a",
+          "op": "getNote",
+          "request": {
+            "id": "03b9wsjvyu3t3ufq044kfzgru"
+          },
+          "response": {
+            "id": "03b9wsjvyu3t3ufq044kfzgru",
+            "journalId": "03aq5qh9copxys3mzz5l8q60f",
+            "title": "Gamma",
+            "content": "Written on a.\n",
+            "tags": [
+              "b"
+            ],
+            "createdAt": "2024-03-05T09:00:00.000Z",
+            "updatedAt": "2024-04-02T00:00:00.000Z",
+            "frontMatter": {
+              "source": "fixture",
+              "priority": 2
+            },
+            "revision": "$any"
+          }
+        },
+        {
+          "device": "b",
+          "op": "getNote",
+          "request": {
+            "id": "03b9wsjvyu3t3ufq044kfzgru"
+          },
+          "response": {
+            "id": "03b9wsjvyu3t3ufq044kfzgru",
+            "journalId": "03aq5qh9copxys3mzz5l8q60f",
+            "title": "Gamma",
+            "content": "Written on a.\n",
+            "tags": [
+              "b"
+            ],
+            "createdAt": "2024-03-05T09:00:00.000Z",
+            "updatedAt": "2024-04-02T00:00:00.000Z",
+            "frontMatter": {
+              "source": "fixture",
+              "priority": 2
+            },
+            "revision": "$any"
+          }
+        },
+        {
+          "device": "a",
+          "op": "searchNotes",
+          "request": {
+            "titles": [
+              "conflicted copy"
+            ]
+          },
+          "response": {
+            "items": [
+              {
+                "id": "$capture:copy",
+                "journalId": "03aq5qh9copxys3mzz5l8q60f",
+                "title": "Gamma (conflicted copy)",
+                "createdAt": "2024-03-05T09:00:00.000Z"
+              }
+            ]
+          }
+        },
+        {
+          "device": "b",
+          "op": "getNote",
+          "request": {
+            "id": "$ref:copy"
+          },
+          "response": {
+            "id": "$ref:copy",
+            "journalId": "03aq5qh9copxys3mzz5l8q60f",
+            "title": "Gamma (conflicted copy)",
+            "content": "Written on b.\n",
+            "tags": [
+              "b"
+            ],
+            "createdAt": "2024-03-05T09:00:00.000Z",
+            "updatedAt": "$any",
+            "frontMatter": {
+              "conflictOf": "03b9wsjvyu3t3ufq044kfzgru",
+              "priority": 2,
+              "source": "fixture"
+            },
+            "revision": "$any"
+          }
+        },
+        {
+          "device": "a",
+          "op": "countNotes",
+          "request": {},
+          "response": {
+            "count": 4
+          }
+        },
+        {
+          "device": "b",
+          "op": "countNotes",
+          "request": {},
+          "response": {
+            "count": 4
+          }
+        }
+      ]
+    },
+    {
+      "name": "a delete reaches the other device",
+      "devices": {
+        "a": "basic",
+        "b": null
+      },
+      "steps": [
+        {
+          "sync": "a"
+        },
+        {
+          "sync": "b"
+        },
+        {
+          "device": "a",
+          "op": "deleteNote",
+          "request": {
+            "id": "03b3m6xaiod1fz6mvkjmvb3jc"
+          }
+        },
+        {
+          "sync": "a"
+        },
+        {
+          "sync": "b"
+        },
+        {
+          "device": "b",
+          "op": "getNote",
+          "request": {
+            "id": "03b3m6xaiod1fz6mvkjmvb3jc"
+          },
+          "error": {
+            "code": "not_found"
+          }
+        },
+        {
+          "device": "b",
+          "op": "listJournals",
+          "response": {
+            "journals": [
+              {
+                "id": "03aqdjryx3t7dd9h7lezzx83o",
+                "name": "personal",
+                "archived": false,
+                "noteCount": 0
+              },
+              {
+                "id": "03aq5qh9copxys3mzz5l8q60f",
+                "name": "work",
+                "archived": false,
+                "noteCount": 2
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "an edit made offline survives a delete elsewhere",
+      "devices": {
+        "a": "basic",
+        "b": null
+      },
+      "steps": [
+        {
+          "sync": "a"
+        },
+        {
+          "sync": "b"
+        },
+        {
+          "device": "a",
+          "op": "deleteNote",
+          "request": {
+            "id": "03b3m6xaiod1fz6mvkjmvb3jc"
+          }
+        },
+        {
+          "device": "b",
+          "op": "updateNote",
+          "request": {
+            "id": "03b3m6xaiod1fz6mvkjmvb3jc",
+            "journalId": "03aqdjryx3t7dd9h7lezzx83o",
+            "title": "Beta notes",
+            "content": "Still thinking about gardens.\n",
+            "tags": [
+              "ideas"
+            ],
+            "updatedAt": "2024-04-02T00:00:00.000Z"
+          },
+          "response": {
+            "id": "03b3m6xaiod1fz6mvkjmvb3jc",
+            "revision": "$capture:rb"
+          }
+        },
+        {
+          "sync": "a"
+        },
+        {
+          "sync": "b"
+        },
+        {
+          "sync": "a"
+        },
+        {
+          "device": "a",
+          "op": "getNote",
+          "request": {
+            "id": "03b3m6xaiod1fz6mvkjmvb3jc"
+          },
+          "response": {
+            "id": "03b3m6xaiod1fz6mvkjmvb3jc",
+            "journalId": "03aqdjryx3t7dd9h7lezzx83o",
+            "title": "Beta notes",
+            "content": "Still thinking about gardens.\n",
+            "tags": [
+              "ideas"
+            ],
+            "createdAt": "2024-02-20T09:00:00.000Z",
+            "updatedAt": "2024-04-02T00:00:00.000Z",
+            "frontMatter": {},
+            "revision": "$ref:rb"
+          }
+        }
+      ]
+    },
+    {
+      "name": "deleting an edited note elsewhere: the edit survives the other order too",
+      "devices": {
+        "a": "basic",
+        "b": null
+      },
+      "steps": [
+        {
+          "sync": "a"
+        },
+        {
+          "sync": "b"
+        },
+        {
+          "device": "b",
+          "op": "updateNote",
+          "request": {
+            "id": "03b9wsjvyu3t3ufq044kfzgru",
+            "journalId": "03aq5qh9copxys3mzz5l8q60f",
+            "title": "Gamma",
+            "content": "Edited before the delete arrived.\n",
+            "tags": [],
+            "frontMatter": {
+              "source": "fixture",
+              "priority": 2
+            },
+            "updatedAt": "2024-04-02T00:00:00.000Z"
+          },
+          "response": {
+            "id": "03b9wsjvyu3t3ufq044kfzgru",
+            "revision": "$any"
+          }
+        },
+        {
+          "device": "a",
+          "op": "deleteNote",
+          "request": {
+            "id": "03b9wsjvyu3t3ufq044kfzgru"
+          }
+        },
+        {
+          "sync": "b"
+        },
+        {
+          "sync": "a"
+        },
+        {
+          "sync": "b"
+        },
+        {
+          "device": "a",
+          "op": "getNote",
+          "request": {
+            "id": "03b9wsjvyu3t3ufq044kfzgru"
+          },
+          "response": {
+            "id": "03b9wsjvyu3t3ufq044kfzgru",
+            "journalId": "03aq5qh9copxys3mzz5l8q60f",
+            "title": "Gamma",
+            "content": "Edited before the delete arrived.\n",
+            "tags": [],
+            "createdAt": "2024-03-05T09:00:00.000Z",
+            "updatedAt": "2024-04-02T00:00:00.000Z",
+            "frontMatter": {
+              "source": "fixture",
+              "priority": 2
+            },
+            "revision": "$any"
+          }
+        },
+        {
+          "device": "b",
+          "op": "getNote",
+          "request": {
+            "id": "03b9wsjvyu3t3ufq044kfzgru"
+          },
+          "response": {
+            "id": "03b9wsjvyu3t3ufq044kfzgru",
+            "journalId": "03aq5qh9copxys3mzz5l8q60f",
+            "title": "Gamma",
+            "content": "Edited before the delete arrived.\n",
+            "tags": [],
+            "createdAt": "2024-03-05T09:00:00.000Z",
+            "updatedAt": "2024-04-02T00:00:00.000Z",
+            "frontMatter": {
+              "source": "fixture",
+              "priority": 2
+            },
+            "revision": "$any"
+          }
+        }
+      ]
+    },
+    {
+      "name": "a note deleted on both devices stays deleted",
+      "devices": {
+        "a": "basic",
+        "b": null
+      },
+      "steps": [
+        {
+          "sync": "a"
+        },
+        {
+          "sync": "b"
+        },
+        {
+          "device": "a",
+          "op": "deleteNote",
+          "request": {
+            "id": "03b3m6xaiod1fz6mvkjmvb3jc"
+          }
+        },
+        {
+          "device": "b",
+          "op": "deleteNote",
+          "request": {
+            "id": "03b3m6xaiod1fz6mvkjmvb3jc"
+          }
+        },
+        {
+          "sync": "a"
+        },
+        {
+          "sync": "b"
+        },
+        {
+          "sync": "a"
+        },
+        {
+          "device": "a",
+          "op": "getNote",
+          "request": {
+            "id": "03b3m6xaiod1fz6mvkjmvb3jc"
+          },
+          "error": {
+            "code": "not_found"
+          }
+        },
+        {
+          "device": "b",
+          "op": "getNote",
+          "request": {
+            "id": "03b3m6xaiod1fz6mvkjmvb3jc"
+          },
+          "error": {
+            "code": "not_found"
+          }
+        },
+        {
+          "device": "a",
+          "op": "countNotes",
+          "request": {},
+          "response": {
+            "count": 2
+          }
+        }
+      ]
+    }
+  ]
+}
