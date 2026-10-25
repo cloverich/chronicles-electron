@@ -38,7 +38,7 @@ export function asciiLower(s: string): string {
   return s.replace(/[A-Z]/g, (c) => c.toLowerCase());
 }
 
-/** `before` is a date (`YYYY`, `YYYY-MM`, `YYYY-MM-DD`) or else a note id. */
+/** A query date: `YYYY`, `YYYY-MM`, or `YYYY-MM-DD`. */
 export function isDateToken(s: string): boolean {
   return /^\d{4}(?:-\d{2}(?:-\d{2})?)?$/.test(s);
 }

@@ -25,9 +25,19 @@ export interface SearchRequest {
   titles?: string[];
 
   /**
-   * Filter documents to those older than a given date
+   * Filter documents to those created before a date (YYYY, YYYY-MM, or YYYY-MM-DD).
    */
   before?: string;
+
+  /**
+   * Filter documents to those created on or after a date (YYYY, YYYY-MM, or YYYY-MM-DD).
+   */
+  after?: string;
+
+  /**
+   * Paging: only documents after this document id, in result order.
+   */
+  cursor?: string;
 
   /**
    * Filter documents to those created on a specific date (YYYY, YYYY-MM, or YYYY-MM-DD).

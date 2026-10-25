@@ -1,6 +1,7 @@
 import {
   and,
   eq,
+  gte,
   inArray,
   like,
   lt,
@@ -114,15 +115,6 @@ export class DocumentsClient {
     private db: BetterSQLite3Database<typeof schema>,
     private files: NodeFilesClient,
   ) {}
-
-  private beforeTokenFormat(input: string): "date" | "id" | "unknown" {
-    const dateRegex = /^(?:\d{4}(?:-\d{2}(?:-\d{2})?)?)$/;
-    const idRegex =
-      /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-    if (dateRegex.test(input)) return "date";
-    if (idRegex.test(input)) return "id";
-    return "unknown";
-  }
 
   findById = async ({ id }: { id: string }): Promise<GetDocumentResponse> => {
     const [row] = await this.db
@@ -392,7 +384,11 @@ export class DocumentsClient {
     });
   };
 
-  search = async (q?: SearchRequest): Promise<SearchResponse> => {
+  /**
+   * WHERE conditions for a search, shared by search and searchCount so the
+   * count always matches the results. `null` means nothing can match.
+   */
+  private filters = async (q?: SearchRequest): Promise<SQL[] | null> => {
     const conditions: SQL[] = [];
 
     if (q?.ids?.length) {
@@ -422,12 +418,14 @@ export class DocumentsClient {
       conditions.push(like(documents.createdAt, `${q.date}%`));
     }
 
+    // Dates compare as string prefixes of createdAt, so before:D and after:D
+    // split the notes with no gap or overlap.
     if (q?.before) {
-      if (this.beforeTokenFormat(q.before) === "date") {
-        conditions.push(lt(documents.createdAt, q.before));
-      } else {
-        conditions.push(lt(documents.id, q.before));
-      }
+      conditions.push(lt(documents.createdAt, q.before));
+    }
+
+    if (q?.after) {
+      conditions.push(gte(documents.createdAt, q.after));
     }
 
     if (q?.titles?.length) {
@@ -443,7 +441,7 @@ export class DocumentsClient {
         .from(documentTags)
         .where(inArray(documentTags.tag, q.tags));
       const ids = taggedIds.map((r) => r.documentId);
-      if (ids.length === 0) return { data: [] };
+      if (ids.length === 0) return null;
       conditions.push(inArray(documents.id, ids));
     }
 
@@ -470,8 +468,23 @@ export class DocumentsClient {
         sql`SELECT id FROM documents_fts WHERE documents_fts MATCH ${ftsTerms}`,
       );
       const ftsIds = ftsRows.map((r) => r.id);
-      if (ftsIds.length === 0) return { data: [] };
+      if (ftsIds.length === 0) return null;
       conditions.push(inArray(documents.id, ftsIds));
+    }
+
+    return conditions;
+  };
+
+  search = async (q?: SearchRequest): Promise<SearchResponse> => {
+    const conditions = await this.filters(q);
+    if (!conditions) return { data: [] };
+
+    // Keyset paging in result order: rows after the cursor note. An unknown
+    // cursor matches nothing (the subquery is NULL).
+    if (q?.cursor) {
+      conditions.push(
+        sql`(${documents.createdAt}, ${documents.id}) < (SELECT c.createdAt, c.id FROM documents c WHERE c.id = ${q.cursor})`,
+      );
     }
 
     const cols = {
@@ -496,61 +509,13 @@ export class DocumentsClient {
   };
 
   /**
-   * Count matching documents (same filters as search, minus pagination).
+   * Count matching documents (same filters as search, minus paging).
    * Used by the UI for "N results" display.
    */
   searchCount = async (q?: SearchRequest): Promise<number> => {
-    const conditions: SQL[] = [];
+    const conditions = await this.filters(q);
+    if (!conditions) return 0;
 
-    if (q?.ids?.length) {
-      conditions.push(inArray(documents.id, q.ids));
-    }
-    if (q?.journals?.length) {
-      conditions.push(inArray(journals.name, q.journals));
-    }
-    if (q?.exclude?.journals?.length) {
-      conditions.push(notInArray(journals.name, q.exclude.journals));
-    }
-    if (q?.date) {
-      conditions.push(like(documents.createdAt, `${q.date}%`));
-    }
-    if (q?.titles?.length) {
-      for (const title of q.titles) {
-        conditions.push(like(documents.title, `%${title}%`));
-      }
-    }
-    if (q?.tags?.length) {
-      const taggedIds = await this.db
-        .selectDistinct({ documentId: documentTags.documentId })
-        .from(documentTags)
-        .where(inArray(documentTags.tag, q.tags));
-      const ids = taggedIds.map((r) => r.documentId);
-      if (ids.length === 0) return 0;
-      conditions.push(inArray(documents.id, ids));
-    }
-    if (q?.exclude?.tags?.length) {
-      const excludedIds = await this.db
-        .selectDistinct({ documentId: documentTags.documentId })
-        .from(documentTags)
-        .where(inArray(documentTags.tag, q.exclude.tags));
-      const ids = excludedIds.map((r) => r.documentId);
-      if (ids.length > 0) {
-        conditions.push(notInArray(documents.id, ids));
-      }
-    }
-    if (q?.texts?.length) {
-      const ftsTerms = q.texts
-        .map((t) => `"${t.replace(/"/g, '""')}"`)
-        .join(" ");
-      const ftsRows = await this.db.all<{ id: string }>(
-        sql`SELECT id FROM documents_fts WHERE documents_fts MATCH ${ftsTerms}`,
-      );
-      const ftsIds = ftsRows.map((r) => r.id);
-      if (ftsIds.length === 0) return 0;
-      conditions.push(inArray(documents.id, ftsIds));
-    }
-
-    // Intentionally skip `before` and `limit` — we want the total count
     const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
     const query = this.db
       .select({ count: sql<number>`count(*)` })

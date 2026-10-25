@@ -60,6 +60,8 @@ export function createNodeNotesClient(deps: {
       titles: q.titles,
       texts: q.texts,
       date: q.date,
+      before: q.before,
+      after: q.after,
     };
     const exclude = {
       journals: await namesFor(q.excludeJournalIds),
@@ -105,7 +107,7 @@ export function createNodeNotesClient(deps: {
         const all = await allJournals();
         const result = await documents.search({
           ...(await toSearchRequest(req)),
-          before: req.before,
+          cursor: req.cursor,
           limit: req.limit,
         });
         return {

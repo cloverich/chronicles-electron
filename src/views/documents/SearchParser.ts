@@ -1,6 +1,6 @@
 import { SearchToken } from "./search/tokens";
 // import { FocusTokenParser } from "./search/parsers/focus";
-import { BeforeTokenParser } from "./search/parsers/before";
+import { AfterTokenParser, BeforeTokenParser } from "./search/parsers/before";
 import { DateTokenParser } from "./search/parsers/date";
 import { FilterTokenParser } from "./search/parsers/filter";
 import { JournalTokenParser } from "./search/parsers/in";
@@ -29,6 +29,7 @@ const parsers: Record<SearchToken["type"], TokenParser<any>> = {
   title: new TitleTokenParser(),
   text: new TextTokenParser(),
   before: new BeforeTokenParser(),
+  after: new AfterTokenParser(),
   date: new DateTokenParser(),
 };
 

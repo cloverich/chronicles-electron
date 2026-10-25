@@ -22,7 +22,7 @@ nothing). Failures reject with `{code, message}`:
 | Operation            | Request → Response                                                                                               |
 | -------------------- | ---------------------------------------------------------------------------------------------------------------- |
 | `getNote`            | `{id}` → `Note`                                                                                                  |
-| `searchNotes`        | `NoteQuery & {before?, limit?}` → `{items: NoteSummary[]}`                                                       |
+| `searchNotes`        | `NoteQuery & {cursor?, limit?}` → `{items: NoteSummary[]}`                                                       |
 | `countNotes`         | `NoteQuery` → `{count}`                                                                                          |
 | `createNote`         | `{journalId, title?, content, tags?, frontMatter?, createdAt?}` → `{id, revision}`                               |
 | `updateNote`         | `{id, baseRevision?, journalId, title?, content, tags, frontMatter?, createdAt?, updatedAt?}` → `{id, revision}` |
@@ -50,8 +50,13 @@ archived, noteCount}`. `NoteSummary` is `{id, journalId, title, createdAt}`.
   descending). `journalIds`/`tags` match any listed value; `excludeJournalIds`
   /`excludeTags` remove notes having any; each `titles` entry must be a
   case-insensitive (ASCII) substring of the title; `date` is a prefix of
-  `createdAt`; `before` is a date (`YYYY[-MM[-DD]]`, compared to `createdAt`)
-  or otherwise a note id (compared to `id`). `texts` is host full-text search:
+  `createdAt`; `before` and `after` are dates (`YYYY[-MM[-DD]]`) compared as
+  strings to `createdAt` — `before` keeps `createdAt < before`, `after` keeps
+  `createdAt >= after`, so the two split notes at a date with no gap or
+  overlap. `countNotes` and bulk updates apply them like every other filter.
+  `cursor` pages: it is the id of the last note of the previous page, and
+  keeps the notes after it in result order (`(createdAt, id) <` the
+  cursor's); an unknown cursor matches nothing. `texts` is host full-text search:
   each term must match the title or content; hosts may stem, so fixtures use
   plain words.
 - **Journals:** names are trimmed, 1–25 characters, not `_attachments`, without

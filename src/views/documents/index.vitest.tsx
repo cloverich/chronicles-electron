@@ -97,7 +97,7 @@ function createSearchStore({
   loading?: boolean;
   error?: string | null;
   nextId?: string | null;
-  lastIds?: Array<string | undefined>;
+  lastIds?: Array<string | null>;
   searchError?: SearchClientError | null;
 } = {}) {
   const applicationStore = createApplicationStore();

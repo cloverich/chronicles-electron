@@ -9,7 +9,7 @@ import {
   type SearchNotesRequest,
   type UpdateNoteRequest,
 } from "./notes";
-import { asciiLower, isDateToken, validateJournalName } from "./rules";
+import { asciiLower, validateJournalName } from "./rules";
 
 /**
  * Reference NotesClient held entirely in memory. It defines the contract's
@@ -125,6 +125,8 @@ export function createMemoryNotesClient(
       }
     }
     if (q.date && !n.createdAt.startsWith(q.date)) return false;
+    if (q.before && !(n.createdAt < q.before)) return false;
+    if (q.after && !(n.createdAt >= q.after)) return false;
     return true;
   };
 
@@ -150,17 +152,21 @@ export function createMemoryNotesClient(
 
     async searchNotes(req: SearchNotesRequest) {
       let items = [...notes.values()].filter((n) => matches(n, req));
-      if (req.before) {
-        const before = req.before;
-        items = items.filter((n) =>
-          isDateToken(before) ? n.createdAt < before : n.id < before,
-        );
-      }
       items.sort(
         (a, b) =>
           compareCodePoints(b.createdAt, a.createdAt) ||
           compareCodePoints(b.id, a.id),
       );
+      if (req.cursor) {
+        const at = notes.get(req.cursor);
+        items = at
+          ? items.filter(
+              (n) =>
+                n.createdAt < at.createdAt ||
+                (n.createdAt === at.createdAt && n.id < at.id),
+            )
+          : [];
+      }
       if (req.limit) items = items.slice(0, req.limit);
       return {
         items: items.map((n) => ({

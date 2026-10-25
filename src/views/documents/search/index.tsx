@@ -26,6 +26,7 @@ const searchTags = [
   { value: "tag:", label: "Filter to specific tag" },
   { value: "title:", label: "Filter by title" },
   { value: "text:", label: "Search body text" },
-  { value: "before:", label: "Before date (YYYY-MM-DD)" },
+  { value: "before:", label: "Created before date (YYYY-MM-DD)" },
+  { value: "after:", label: "Created on or after date (YYYY-MM-DD)" },
   { value: "date:", label: "On date (YYYY-MM-DD)" },
 ];

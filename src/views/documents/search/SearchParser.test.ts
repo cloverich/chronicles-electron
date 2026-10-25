@@ -208,6 +208,28 @@ describe("SearchParser", function () {
       });
     });
 
+    test("before: and after: take only dates, one of each", function () {
+      const parser = new SearchParser();
+      assert.isUndefined(parser.parseToken("before:03b9wsjvyu3t3ufq044kfzgru"));
+      assert.isUndefined(parser.parseToken("after:yesterday"));
+
+      const tokens = parser.parseTokens([
+        "after:2022",
+        "before:2023-06",
+      ]) as SearchToken[];
+      const merged = parser.mergeToken(
+        tokens,
+        parser.parseToken("after:2022-02") as SearchToken,
+      );
+      assert.deepEqual(merged, [
+        { type: "before", value: "2023-06" },
+        { type: "after", value: "2022-02" },
+      ]);
+      assert.deepEqual(parser.removeToken(merged, "after:2022-02"), [
+        { type: "before", value: "2023-06" },
+      ]);
+    });
+
     test("date: with year", function () {
       const parser = new SearchParser();
       const dateToken = parser.parseToken("date:2025");

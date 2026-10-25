@@ -100,11 +100,15 @@ export interface NoteQuery {
   texts?: string[];
   /** createdAt starts with this `YYYY`, `YYYY-MM`, or `YYYY-MM-DD`. */
   date?: string;
+  /** createdAt is before this `YYYY[-MM[-DD]]`. */
+  before?: string;
+  /** createdAt is on or after this `YYYY[-MM[-DD]]`. */
+  after?: string;
 }
 
 export interface SearchNotesRequest extends NoteQuery {
-  /** Only notes created before this date (`YYYY[-MM[-DD]]`) or note id. */
-  before?: string;
+  /** Only notes after this note id, in result order (for paging). */
+  cursor?: string;
   limit?: number;
 }
 

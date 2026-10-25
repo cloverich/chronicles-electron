@@ -68,10 +68,18 @@ export type TextToken = {
 };
 
 /**
- * Searching documents created after the given date string
+ * Searching documents created before the given date string
  */
 export type BeforeToken = {
   type: "before";
+  value: string;
+};
+
+/**
+ * Searching documents created on or after the given date string
+ */
+export type AfterToken = {
+  type: "after";
   value: string;
 };
 
@@ -91,4 +99,5 @@ export type SearchToken =
   | TitleToken
   | TextToken
   | BeforeToken
+  | AfterToken
   | DateToken;

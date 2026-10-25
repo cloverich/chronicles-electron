@@ -64,6 +64,7 @@ export class SearchStore {
   loading = true;
   error: string | null = null;
   count: number = 0;
+  pageSize = 100;
   private journals: JournalsStore;
   private parser: SearchParser;
   // NOTE: Public so it can be updated by render calls, since useSearchParmas changes on
@@ -99,6 +100,7 @@ export class SearchStore {
       selectedTags: computed,
       searchTokens: computed,
       nextId: observable,
+      cursor: observable,
       lastIds: observable,
       hasNext: computed,
       hasPrev: computed,
@@ -149,7 +151,7 @@ export class SearchStore {
   }
 
   // todo: this might be better as a @computed get
-  private tokensToQuery = (): SearchNotesRequest => {
+  private tokensToQuery = (): NoteQuery => {
     const journals = this.tokens
       .filter((t) => t.type === "in" && !(t as any).excluded)
       .map((token) => token.value) as string[]; // assumes pre-validated by addToeken above
@@ -174,12 +176,10 @@ export class SearchStore {
     const texts = this.tokens
       .filter((t) => t.type === "text")
       .map((t) => t.value) as any as string[];
-    let before: string = "";
-
-    const beforeToken = this.tokens.find((t) => t.type === "before");
-    if (beforeToken) {
-      before = beforeToken.value as string;
-    }
+    const before = this.tokens.find((t) => t.type === "before")?.value as
+      string | undefined;
+    const after = this.tokens.find((t) => t.type === "after")?.value as
+      string | undefined;
 
     const dateToken = this.tokens.find((t) => t.type === "date");
     const date = dateToken?.value as string | undefined;
@@ -198,15 +198,15 @@ export class SearchStore {
       excludeTags: excludedTags,
       titles,
       texts,
-      ...(before ? { before } : {}),
       date,
+      before,
+      after,
     };
   };
 
   /** The active search as a contract query (no paging). */
   get query(): NoteQuery {
-    const { before: _before, limit: _limit, ...query } = this.tokensToQuery();
-    return query;
+    return this.tokensToQuery();
   }
 
   private toSearchItem = (item: NoteSummary): SearchItem => ({
@@ -255,39 +255,42 @@ export class SearchStore {
    *  we don't want to reset the pagination state.
    */
   search = async (opts: { limit?: number; resetPagination?: boolean } = {}) => {
-    const limit = opts.limit || 100;
-    const resetPagination = opts.resetPagination || true;
+    const limit = opts.limit || this.pageSize;
+    const resetPagination = opts.resetPagination ?? true;
 
     this.loading = true;
     this.error = null;
 
-    const q = this.tokensToQuery();
+    if (resetPagination) {
+      this.cursor = null;
+      this.lastIds = [];
+    }
 
     // For determining if there is a next, add one to the limit
     // and see if we get it back.
-    q.limit = limit + 1;
+    const q: SearchNotesRequest = {
+      ...this.tokensToQuery(),
+      ...(this.cursor ? { cursor: this.cursor } : {}),
+      limit: limit + 1,
+    };
 
     try {
       const docs = (await this.notes.searchNotes(q)).items.map(
         this.toSearchItem,
       );
 
+      // The next page starts after the last note shown, not the extra one.
       if (docs.length > limit) {
-        this.nextId = docs[docs.length - 1].id;
         docs.pop();
+        this.nextId = docs[docs.length - 1].id;
       } else {
         this.nextId = null;
-      }
-
-      if (resetPagination) {
-        this.lastIds = [];
       }
 
       this.docs = docs;
 
       // Get total count for search results (without pagination)
-      const { before: _before, ...countQuery } = this.tokensToQuery();
-      this.count = (await this.notes.countNotes(countQuery)).count;
+      this.count = (await this.notes.countNotes(this.tokensToQuery())).count;
     } catch (err) {
       console.error("Error with documents.search results", err);
       this.error = err instanceof Error ? err.message : JSON.stringify(err);
@@ -355,15 +358,12 @@ export class SearchStore {
     });
   }
 
-  // TODO:Test cases, sigh
-  // When < limit, there is no next
-  // When click next, next doc is correct, lastId works as expected
-  // When next to last page, there is no next
-  // When back to prior page, next and last id are correct
-  // When back to first page, there is no last Id
-  // New searches clear pagination data
+  // Paging is kept here rather than as a search token, so before:/after:
+  // stay date filters. `cursor` is the last note of the previous page
+  // (null on the first); `lastIds` holds the cursors of earlier pages.
   nextId: string | null = null;
-  lastIds: (string | undefined)[] = [];
+  cursor: string | null = null;
+  lastIds: (string | null)[] = [];
   get hasNext() {
     return !!this.nextId;
   }
@@ -374,33 +374,15 @@ export class SearchStore {
   next = () => {
     if (!this.nextId) return;
 
-    const lastBefore = this._tokens.find((t) => t.type === "before")?.value;
-
-    // This doesn't infer that lastBefore will be a token with a string value;
-    // it thinks NodeMatch is possible here. Undefined indicates no prior page,
-    // and logic above handles that.
-    this.lastIds.push(lastBefore as string | undefined);
-    this.addToken(`before:${this.nextId}`, false);
+    this.lastIds.push(this.cursor);
+    this.cursor = this.nextId;
+    this.search({ resetPagination: false });
   };
 
   prev = () => {
     if (!this.hasPrev) return;
 
-    const lastId = this.lastIds.pop();
-
-    if (lastId) {
-      this.addToken(`before:${lastId}`, false);
-    } else {
-      // Indicates this is the first next page, and clickign prev
-      // takes us to the first page, i.e. no before: token
-      const lastBefore = this._tokens.find((t) => t.type === "before");
-
-      if (lastBefore) {
-        this.removeToken(`before:${lastBefore.value}`, false);
-      } else {
-        // Didn't come up in testing, but this is a good sanity check
-        console.error("Called prev but no before: token found?");
-      }
-    }
+    this.cursor = this.lastIds.pop() ?? null;
+    this.search({ resetPagination: false });
   };
 }
