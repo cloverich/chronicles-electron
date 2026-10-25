@@ -18,6 +18,7 @@ Node code.
 | [theme.md](theme.md)                 | Theme files: colors, note typography, and how overrides resolve   |
 | [sync.md](sync.md)                   | Records, change detection, and merge rules for syncing devices    |
 | [activity.md](activity.md)           | The local activity log: what changed, and restoring deletes       |
+| [encryption.md](encryption.md)       | End-to-end encryption of synced records: keys, envelope, records  |
 | `vectors/`                           | Golden inputs and expected outputs                                |
 
 ## Status
@@ -42,6 +43,8 @@ vectors/
   theme/cases.json           theme file in → resolved variants and typography, or error paths
   sync/<area>.json           multi-device scenarios over one server (see sync.md)
   activity/cases.json        library changes in → activity log out (see activity.md)
+  encryption/cases.json      fixed keys and nonces → derived keys, HMACs, envelopes
+                             (node scripts/encryption-vectors.mjs writes it)
 ```
 
 An implementation passes a vector when:
@@ -67,8 +70,10 @@ An implementation passes a vector when:
   [theme.md](theme.md#vectors)).
 - **sync:** every scenario passes (see [sync.md](sync.md#vectors)).
 - **activity:** every case's log matches (see [activity.md](activity.md#vectors)).
+- **encryption:** every derivation and envelope matches, and every tampered
+  envelope is refused (see [encryption.md](encryption.md#vectors)).
 
-In this repo, `yarn test:node` runs every vector except `theme/`, `sync/`, and `activity/`
+In this repo, `yarn test:node` runs every vector except `theme/`, `sync/`, `activity/`, and `encryption/`
 (`src/node-client/spec-vectors.test.ts`); the Swift app runs those. To regenerate after an intentional
 change:
 
