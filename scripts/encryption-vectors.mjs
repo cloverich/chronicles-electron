@@ -45,19 +45,24 @@ function recoveryCode(raw) {
 const libraryKey = bytes(0x10, 32);
 const journalKey = bytes(0x40, 32);
 const recovery = bytes(0x80, 20);
+const journalId = "03aq5qh9copxys3mzz5l8q60f";
+const generation = 1;
+const domain = `${journalId}.${generation}`;
 
 const libraryRecordKey = hkdf(libraryKey, "chronicles.v1 library");
-const revisionKey = hkdf(libraryKey, "chronicles.v1 revision");
-const attachmentNameKey = hkdf(libraryKey, "chronicles.v1 attachment-name");
+const libraryRevisionKey = hkdf(libraryKey, "chronicles.v1 revision");
 const recoveryKey = hkdf(recovery, "chronicles.v1 recovery");
+const recordKey = hkdf(journalKey, "chronicles.v1 records");
+const revisionKey = hkdf(journalKey, "chronicles.v1 revision");
+const attachmentNameKey = hkdf(journalKey, "chronicles.v1 attachment-name");
 
 const attachmentName =
   "9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08.png";
 const attachmentFileKey = hkdf(
-  libraryKey,
+  journalKey,
   `chronicles.v1 attachment-file|${attachmentName}`,
 );
-const attachmentHmac = hmac(attachmentNameKey, attachmentName);
+const attachmentRecordId = `${journalId}.${hmac(attachmentNameKey, attachmentName)}`;
 const attachmentBytes = Buffer.from(
   "not really a png, but bytes all the same\n",
   "utf8",
@@ -79,33 +84,28 @@ const noteFile = [
 const noteRevision = createHash("sha256")
   .update(noteFile, "utf8")
   .digest("hex");
-const journalPayload =
-  '{"archivedAt":null,"id":"03aq5qh9copxys3mzz5l8q60f","name":"Personal"}';
+const journalPayload = `{"archivedAt":null,"id":"${journalId}","name":"Personal"}`;
 
 const envelopes = [
   {
-    name: "note under its journal key",
-    key: hex(journalKey),
+    name: "note under its domain's record key",
+    key: hex(recordKey),
     nonce: hex(bytes(0xa0, 12)),
-    aad: {
-      kind: "note",
-      id: "03h0yunh0hl4mhnoj8x01gx57",
-      keyId: "03aq5qh9copxys3mzz5l8q60f",
-    },
+    aad: { kind: "note", id: "03h0yunh0hl4mhnoj8x01gx57", keyId: domain },
     plaintext: noteFile,
   },
   {
-    name: "journal under the library record key",
-    key: hex(libraryRecordKey),
+    name: "journal under its domain's record key",
+    key: hex(recordKey),
     nonce: hex(bytes(0xb0, 12)),
-    aad: { kind: "journal", id: "03aq5qh9copxys3mzz5l8q60f", keyId: "library" },
+    aad: { kind: "journal", id: journalId, keyId: domain },
     plaintext: journalPayload,
   },
   {
-    name: "journal key under the library record key",
+    name: "journal key in a library slot",
     key: hex(libraryRecordKey),
     nonce: hex(bytes(0xc0, 12)),
-    aad: { kind: "key", id: "03aq5qh9copxys3mzz5l8q60f", keyId: "library" },
+    aad: { kind: "key", id: domain, keyId: "library" },
     plaintextHex: hex(journalKey),
   },
   {
@@ -119,7 +119,7 @@ const envelopes = [
     name: "attachment file, deterministic",
     key: hex(attachmentFileKey),
     nonce: hex(Buffer.alloc(12)),
-    aad: { kind: "attachment", id: attachmentHmac, keyId: "library" },
+    aad: { kind: "attachment", id: attachmentRecordId, keyId: domain },
     plaintextHex: hex(attachmentBytes),
   },
 ].map((item) => {
@@ -135,6 +135,15 @@ const envelopes = [
   );
   return { ...item, envelope: sealed.toString("base64") };
 });
+
+// The key record holding the library slot above; its revision is the payload's sha256.
+const keyRecordPayload = JSON.stringify({
+  generation,
+  slots: [{ key: envelopes[2].envelope, type: "library" }],
+});
+const keyRecordRevision = createHash("sha256")
+  .update(keyRecordPayload, "utf8")
+  .digest("hex");
 
 // Each tampered case must fail to open: a flipped ciphertext bit, a moved record, a wrong key id.
 const note = envelopes[0];
@@ -156,7 +165,13 @@ const tampered = [
   {
     name: "claims another journal",
     key: note.key,
-    aad: { ...note.aad, keyId: "03aqdjryx3t7dd9h7lezzx83o" },
+    aad: { ...note.aad, keyId: "03aqdjryx3t7dd9h7lezzx83o.1" },
+    envelope: note.envelope,
+  },
+  {
+    name: "claims another generation",
+    key: note.key,
+    aad: { ...note.aad, keyId: `${journalId}.2` },
     envelope: note.envelope,
   },
   {
@@ -180,15 +195,28 @@ const cases = {
       .digest("hex")
       .slice(0, 16),
     libraryRecordKey: hex(libraryRecordKey),
+    libraryRevisionKey: hex(libraryRevisionKey),
+    recoveryKey: hex(recoveryKey),
+  },
+  journal: {
+    id: journalId,
+    generation,
+    keyId: domain,
+    journalKey: hex(journalKey),
+    recordKey: hex(recordKey),
     revisionKey: hex(revisionKey),
     attachmentNameKey: hex(attachmentNameKey),
-    recoveryKey: hex(recoveryKey),
   },
   revision: { revision: noteRevision, hmac: hmac(revisionKey, noteRevision) },
   attachment: {
     name: attachmentName,
-    recordId: attachmentHmac,
+    recordId: attachmentRecordId,
     fileKey: hex(attachmentFileKey),
+  },
+  keyRecord: {
+    payload: keyRecordPayload,
+    revision: keyRecordRevision,
+    hmac: hmac(libraryRevisionKey, keyRecordRevision),
   },
   envelopes,
   tampered,
