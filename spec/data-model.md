@@ -42,6 +42,15 @@ No identity is ever derived from a name or a path.
 Column-owned keys: `id`, `title`, `journal`, `createdAt`, `updatedAt`, `tags`.
 They live in their own fields and are stripped from `frontMatter` on write.
 
+**Pins.** The user key `pinnedAt` (a timestamp) marks a pinned note. It travels
+with the note (exports, sync, revision) as any user key does, and hosts that
+don't pin preserve it untouched. Pinning or unpinning leaves `updatedAt`
+unchanged. A library holds at most five pins: hosts refuse a sixth
+(`invalid_input`), but a merge may leave more, and all are shown. Lists
+without a search show the pinned notes within their scope (all notes, a
+journal, a tag) first, most recently pinned first, apart from and not repeated
+in the rest; searches show no pinned group, only matches.
+
 Timestamps are ISO 8601 strings in UTC with millisecond precision
 (`2024-01-02T03:04:05.678Z`) when Chronicles writes them. Imported values are
 preserved verbatim.

@@ -61,7 +61,7 @@ Moves name journals, not IDs, so a row reads the same after a journal is gone.
 - **Create:** `created` (`imported` when the origin is `import`).
 - **Update:** one row per aspect that changed, in this order: `moved`,
   `renamed`, `tagged`, `untagged`, `edited`. An update that changes none of
-  them (the same revision, or only `updatedAt`) writes nothing.
+  them (the same revision, or only `updatedAt` or `pinnedAt`) writes nothing.
 - **Delete:** `deleted`, with the note's file (export format, references in
   stored form, exactly the sync note payload) as `payload`.
 - **Bulk change:** one row per note that actually changed, under one batch,
