@@ -2,7 +2,7 @@
 
 ## Current Plan
 
-Planning lives in Engram (journal "chronicles", tag `planning`). Start at the **Chronicles ecosystem roadmap** note (`03gzds1t5ol59s5d8mj1by9wi`); it links the data spec, export spec, NotesClient seam, Swift app, and deferred sync notes.
+Planning lives in Engram (journal "chronicles", tag `planning`). Start at the **Chronicles ecosystem roadmap** note (`03gzds1t5ol59s5d8mj1by9wi`); it links the data spec, export spec, NotesClient seam, Swift app, and deferred sync notes. Anything work is waiting on Chris for goes in **Waiting on Chris** (`03h4a7ekurd5aeceixsw71se4`) with exact steps; move items to its Done section when answered.
 
 1. Get Chronicles (Electron) to the seam: export format spec, data spec v1 migrations, `NotesClient` contract with fixtures.
 2. Build a standalone Swift app (Mac + iPhone) from those specs, forking in the Lexical UI.
