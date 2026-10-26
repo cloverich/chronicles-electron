@@ -1,8 +1,8 @@
 # Encryption
 
 How a library's synced records are encrypted end to end, so the server
-(CloudKit today, a relay later) stores only ciphertext. Status: draft, not yet
-implemented. Builds on [sync.md](sync.md).
+(CloudKit today, a relay later) stores only ciphertext. Status: draft, E1
+implemented by the Swift app. Builds on [sync.md](sync.md).
 
 ## Threats
 
@@ -126,13 +126,23 @@ adds a plaintext `keyId` field naming the domain (or `library`).
   attachment no note uses isn't sent. Each file is encrypted under its own file
   key with an all-zero nonce, which is safe because each key encrypts exactly
   one plaintext, and makes the upload deterministic within a domain. The
-  original `name` travels inside the note text, as today.
+  record's text field holds the `name` as an envelope under the domain record
+  key (same AAD as the file); a reader checks it against the record id and the
+  bytes' hash.
 - **Key records** (`key.<journal ID>`) are compact JSON:
   `{"generation":1,"slots":[{"key":"<envelope>","type":"library"}]}`. A
   `library` slot's envelope is JK under the library record key, with AAD kind
   `key`, record id the domain's key id, key id `library`. Readers ignore slot
-  types they don't know. A key record is saved before any record of its domain.
-- **`keyring.library`** holds the fingerprint and the recovery-wrapped LK.
+  types they don't know. No record of a domain is sent until the server has
+  accepted its key record; when two devices make a key for the same journal,
+  the one the server accepted first wins, and the other adopts it.
+- **`keyring.library`** is compact JSON `{"fingerprint":"…","key":"<envelope>"}`:
+  LK under the recovery wrapping key, AAD kind `keyring`, id `library`, key id
+  `recovery`. Devices holding the same LK adopt whichever keyring the server has.
+- **Opening** a domain record checks that it belongs to the domain: a note's
+  `journal` (a journal record's `id`) must be the domain's journal. A record
+  that fails to open is skipped, never applied. One whose key hasn't arrived
+  waits until it does.
 
 ## Turning it on, and joining
 
@@ -141,8 +151,11 @@ adds a plaintext `keyId` field naming the domain (or `library`).
   stops syncing (sync.md), and rejoins once it has LK. Deleting the zone, rather
   than overwriting records, leaves no plaintext versions behind.
 - **Joining:** a device that finds a `keyring` whose fingerprint matches a key
-  in its keychain uses it; otherwise it asks for the recovery code. A device
-  never sends plaintext records to a zone that has a keyring.
+  in its keychain uses it; otherwise it asks for the recovery code, and applies
+  and sends nothing until it has it. A device never sends plaintext records to
+  a zone that has a keyring: a joining device sends nothing until its first
+  fetch has finished, and one that learns mid-fetch that the library is
+  encrypted forgets what it applied and fetches again with the key.
 - **Turning off** is the same as turning on, in reverse, and needs LK.
 
 ## Journal access (later)
