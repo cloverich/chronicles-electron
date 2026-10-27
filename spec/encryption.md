@@ -20,8 +20,9 @@ Protection, and not record metadata. A relay would see everything. Encrypting
 in the app makes the server's view the same everywhere.
 
 **Not covered:** the device itself while unlocked. The local library stays
-plaintext in phase E1, protected by the OS; exports and backups stay plaintext,
-since they are the person's own copies.
+plaintext in phase E1, protected by the OS. Backups stay plaintext, since they
+are the person's own copies; an export is plaintext or, by choice, sealed
+with the library key ([Exports](#exports)).
 
 ## What the server can see
 
@@ -76,6 +77,8 @@ key is used only through its derived keys, never directly:
 | Attachment stream key | JK            | `chronicles.v1 attachment-stream\|` + name |
 | Attachment file key   | JK            | `chronicles.v1 attachment-file \|` + name  |
 | Recovery wrapping key | recovery code | `chronicles.v1 recovery`                   |
+| Library export key    | LK            | `chronicles.v1 export`                     |
+| Export stream key     | export key    | `chronicles.v1 export-stream`              |
 
 `name` is the attachment's `<sha256><ext>`. The attachment file key is read
 only, for files sealed before streams (below). The **fingerprint** is the first
@@ -217,6 +220,23 @@ adds a plaintext `keyId` field naming the domain (or `library`).
   problem, a lost recovery code while a device still has the data, or a key
   that may have leaked.
 
+## Exports
+
+An export can be sealed ([export-format.md](export-format.md#encrypted-form)):
+the single-file export as a `0x02` stream under a random **export key**, which
+the header wraps under the library export key, beside a copy of the
+library's keyring. So an encrypted export opens on any device holding LK with
+nothing to type, and anywhere else with the recovery code; the person keeps
+no new secret. The library key, not a passphrase, because the recovery code
+is already 160 random bits kept somewhere safe: no key stretching, nothing
+weak to guess offline, and nothing new to lose. A passphrase slot can come
+later, for handing an export to someone who shouldn't hold the library's keys.
+
+Whoever has an encrypted export and the recovery code can read it; that is
+no more than the code already opens, since it opens the library in iCloud.
+Whoever has only the file learns its size, its format version, and which
+library key sealed it.
+
 ## Journal access (later)
 
 None of this is built in E1; the formats above are shaped so it needs no
@@ -259,3 +279,13 @@ stream must have the given `size` and `sha256` (and, when short, be
 byte ranges of the case named by `from`, joined in order, with the bit at
 byte `flip` flipped if given; opened under its `key` and `aad` (the stream's
 when absent), it must fail, and leave no plaintext.
+
+`vectors/encryption/export.json` holds encrypted exports, under the library
+key and recovery code of `cases.json`: the derived keys, each case's header
+and file (stream plaintext generated as above), whole when short, else size
+and sha256. An implementation passes when it writes each file byte for byte
+from the case's export key, export id, and slot nonce; opens it both with the
+library key and with the recovery code; and refuses each `tampered` file
+(base64) opened `with` the library key, the recovery code, or the key or
+code given, at the step `fails` names: `magic`, `header`, `slot` (no slot
+opens), or `stream`.

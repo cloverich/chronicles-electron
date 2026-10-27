@@ -5,7 +5,8 @@ between apps, and the definition of a note's canonical bytes (and therefore its
 revision).
 
 An export is a tree of files. It travels either as a folder or as a single zip
-file holding the same tree (see [Single-file form](#single-file-form)). It
+file holding the same tree (see [Single-file form](#single-file-form)), which
+may be sealed with the library's key (see [Encrypted form](#encrypted-form)). It
 covers either the whole library or chosen journals (see
 [Partial export](#partial-export)).
 
@@ -213,6 +214,118 @@ A reader must support:
 A reader must reject, before writing anything, an entry whose name is
 absolute, contains a `..` segment or a `\`, or is a symbolic link.
 
+## Encrypted form
+
+The single-file form, sealed, so an export can sit in iCloud Drive, a
+backup disk, or an email without being readable there. It opens with the
+library's own key, or with the library's recovery code on a device that
+doesn't have the key ([encryption.md](encryption.md#keys)), so restoring
+needs nothing a person doesn't already keep. Writers offer it next to the
+plaintext forms, never in place of them: the plaintext export stays the
+copy any tool can read.
+
+```
+file   = magic ‖ header ‖ 0x0A ‖ stream
+magic  = "chronicles-encrypted-export/1" 0x0A
+header = compact JSON on one line (no LF inside), keys in code-point order
+stream = the single-file form's zip bytes, sealed as a 0x02 stream
+```
+
+Name: writers name the file `<name>.chronicles.encrypted`. Readers decide by
+content: a file that starts with `magic` is an encrypted export, whatever
+its name. A file that starts with `chronicles-encrypted-export/` and another
+version is one made by a later app: readers say so, and read nothing.
+
+### Header
+
+```json
+{
+  "exportId": "<32 hex>",
+  "formatVersion": "2.0",
+  "slots": [
+    {
+      "fingerprint": "<16 hex>",
+      "key": "<envelope>",
+      "keyring": "<envelope>",
+      "type": "library"
+    }
+  ]
+}
+```
+
+- `exportId`: 16 random bytes in lowercase hex, new for every export.
+- `formatVersion`: the export format of the zip inside (see
+  [Versioning](#versioning)), so a reader can refuse an unknown major
+  version before asking for a key.
+- `slots`: the ways to the **export key** (EK), 32 random bytes made for
+  this export alone. Readers ignore slot types they don't know, and fail
+  with a clear message when no slot is one they can open.
+
+A `library` slot:
+
+- `fingerprint`: the library key's fingerprint, naming the key without
+  revealing it, so a reader knows whether it holds that key.
+- `key`: EK in a `0x01` envelope under the **library export key** (HKDF of
+  the library key, info `chronicles.v1 export`), AAD kind `export`, record
+  id the `exportId`, key id `library`.
+- `keyring`: the library key in a `0x01` envelope under the recovery
+  wrapping key: the library's `keyring.library` envelope, copied verbatim
+  (AAD kind `keyring`, id `library`, key id `recovery`). A writer needs only
+  the keyring it already holds, never the recovery code itself.
+
+That is all a reader sees without a key: the format version, an id, the
+library key's fingerprint, and the file's size. Journal names, titles, note
+counts, attachment names, and dates are inside the stream.
+
+A later `passphrase` slot (EK under a key stretched from a passphrase, as
+encryption.md's journal locks) can open an export for someone without the
+library's keys; none is defined yet.
+
+### Stream
+
+The zip is sealed exactly as an attachment file is
+([encryption.md](encryption.md#attachment-files)): `0x02`, then 64 KiB
+chunks under AES-256-GCM with counter nonces, the last chunk flagged in its
+nonce. Here:
+
+- The key is the **export stream key**: HKDF of EK, info
+  `chronicles.v1 export-stream`.
+- The AAD is `chronicles.v1|export-stream|<exportId>|<header sha256>`, where
+  `<header sha256>` is the lowercase hex SHA-256 of the header's bytes
+  (without the LF). Every chunk is bound to the header, so a header edited
+  in any way (a version, a slot swapped in from another export, a byte
+  added) fails the first chunk.
+- EK is random per export and seals one plaintext, so counter nonces never
+  repeat under a key.
+
+Writers seal from file to file, so memory stays at a chunk or two whatever
+the library's size, and publish atomically, like the other forms.
+
+### Opening
+
+1. Read `magic` and the header (a reader may refuse a header over 64 KiB);
+   refuse an unknown magic version or an unknown major `formatVersion`.
+2. Get EK from a slot: a `library` slot whose `fingerprint` names a library
+   key this device holds opens with it, asking nothing. Otherwise ask for
+   the recovery code, open `keyring` with it, check the opened key's
+   fingerprint is the slot's, and open `key`. A code that doesn't open
+   `keyring` is the wrong code; say so, and ask again.
+3. Open the stream to a temporary file. Every chunk is authenticated before
+   anything is imported: a stream that fails partway (tampered, cut short,
+   or with bytes after its last chunk) imports nothing and leaves nothing
+   behind.
+4. Import the temporary file as a single-file export ([Import](#import)).
+
+An export made before the library was removed from iCloud opens with the
+recovery code it had then: removing the library retires the key on every
+device, but the export carries its own keyring. Its fingerprint tells the
+person which code that is.
+
+**Readers that don't read the encrypted form** (the Electron app, which is
+maintenance-only) recognize `magic` and refuse the file with a message that
+it is an encrypted export, made to be opened by the iPhone or Mac app,
+rather than read it as something else.
+
 ## Versioning
 
 `formatVersion` is `"<major>.<minor>"`. Readers reject an unknown major version
@@ -225,7 +338,8 @@ directories remain importable.
 ## Import
 
 Importers accept both the folder and the single-file form. A single file is
-read as its extracted tree.
+read as its extracted tree; an encrypted one ([Encrypted form](#encrypted-form))
+is opened first, then read as the single file inside.
 
 1. Read `manifest.json` if present; reject an unknown major version.
 2. Create every manifest journal, then walk `<dir>/<id>.md` files; a note's

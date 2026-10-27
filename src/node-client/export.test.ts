@@ -779,6 +779,27 @@ describe("ExportClient.export archive", () => {
     }
   });
 
+  test("an encrypted export is refused, not misread", async () => {
+    const file = path.join(parentDir, "sealed.chronicles.encrypted");
+    writeFileSync(
+      file,
+      Buffer.concat([
+        Buffer.from('chronicles-encrypted-export/1\n{"exportId":"00"}\n'),
+        Buffer.from([2, 1, 2, 3]),
+      ]),
+    );
+    const notesDir = mkdtempSync(path.join(tmpdir(), "chronicles-sealed-"));
+    try {
+      const client = await createClient({ dbPath: ":memory:", notesDir });
+      await assert.rejects(
+        client.importer.import(file, SourceType.Chronicles),
+        /IMPORT_ENCRYPTED/,
+      );
+    } finally {
+      rmSync(notesDir, { recursive: true, force: true });
+    }
+  });
+
   test("a zip imports only as a Chronicles export", async () => {
     const zip = path.join(parentDir, "other.chronicles.zip");
     await fixture.client.export.export(zip, { format: "archive" });

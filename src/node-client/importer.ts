@@ -21,7 +21,11 @@ import {
 import { createId } from "../preload/client/util";
 import { PathStatsFile, walk } from "../preload/utils/fs-utils";
 import type { IDocumentsClient } from "./documents";
-import { extractArchive, isArchiveFile } from "./export-archive";
+import {
+  extractArchive,
+  isArchiveFile,
+  isEncryptedExport,
+} from "./export-archive";
 import type { NodeFilesClient } from "./files";
 import { FilesImportResolver } from "./files-import-resolver";
 import { isSameOrInside } from "./fs-guards";
@@ -133,6 +137,12 @@ export class ImporterClient {
   ): Promise<ChroniclesImportReport | void> => {
     importDir = path.resolve(importDir);
     const chroniclesRoot = this.notesDir;
+
+    if (await isEncryptedExport(importDir)) {
+      throw new Error(
+        "[IMPORT_ENCRYPTED] This is an encrypted Chronicles export. Open it with Chronicles on iPhone or Mac, or import a plaintext export here.",
+      );
+    }
 
     // A single-file export (spec: "Single-file form") imports as its
     // extracted tree; zip is only ever a Chronicles export.

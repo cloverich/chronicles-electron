@@ -36,6 +36,29 @@ export async function isArchiveFile(p: string): Promise<boolean> {
   }
 }
 
+/**
+ * Whether `p` is an encrypted export (spec: "Encrypted form"), which only the
+ * iPhone and Mac apps open; this app refuses one rather than misread it.
+ */
+export async function isEncryptedExport(p: string): Promise<boolean> {
+  const magic = Buffer.from("chronicles-encrypted-export/", "utf8");
+  try {
+    const stat = await fs.promises.stat(p);
+    if (!stat.isFile()) return false;
+    const fd = await fs.promises.open(p, "r");
+    try {
+      const head = Buffer.alloc(magic.length);
+      const { bytesRead } = await fd.read(head, 0, magic.length, 0);
+      return bytesRead === magic.length && head.equals(magic);
+    } finally {
+      await fd.close();
+    }
+  } catch (err: any) {
+    if (err?.code === "ENOENT") return false;
+    throw err;
+  }
+}
+
 /** Every file under dir, as `/`-separated relative paths. */
 function listFiles(dir: string): string[] {
   return fs

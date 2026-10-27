@@ -1,0 +1,122 @@
+{
+  "magic": "chronicles-encrypted-export/1\n",
+  "libraryKey": "101112131415161718191a1b1c1d1e1f202122232425262728292a2b2c2d2e2f",
+  "recoveryCode": "G20R-50W4-GP38-F249-HA5R-S3CE-HY89-34MK",
+  "libraryExportKey": "6cccc2519ba5709cce95c77c6e8ca92cf6781a69e5b64afa168d2e76878588dc",
+  "plaintext": "byte i is i % 251",
+  "cases": [
+    {
+      "name": "empty zip bytes",
+      "length": 0,
+      "exportKey": "606162636465666768696a6b6c6d6e6f707172737475767778797a7b7c7d7e7f",
+      "exportId": "909192939495969798999a9b9c9d9e9f",
+      "slotNonce": "e0e1e2e3e4e5e6e7e8e9eaeb",
+      "header": "{\"exportId\":\"909192939495969798999a9b9c9d9e9f\",\"formatVersion\":\"2.0\",\"slots\":[{\"fingerprint\":\"89c7460452eddff1\",\"key\":\"AeDh4uPk5ebn6Onq61OUhQoscHlZOUwvc2539cy/PAr22m+CkLBehAJNzlqRzrPrRxH298Wb847/UTu/hg==\",\"keyring\":\"AdDR0tPU1dbX2Nna22o35HAPMae/aJXc1ifaiSb5v17BjVKJghMxee/voOiTkCGzTBPEXZj/5G8pSV5YQA==\",\"type\":\"library\"}]}",
+      "streamKey": "eb3dc18889106a7015e95505dbc5564069180d1a6bcb1410467ec23b57f6f0f6",
+      "size": 369,
+      "sha256": "e541e136ff4bf68df575fdcb5fefa55141c6bcf7df964e0ed5b6fb3b0cd01804",
+      "file": "Y2hyb25pY2xlcy1lbmNyeXB0ZWQtZXhwb3J0LzEKeyJleHBvcnRJZCI6IjkwOTE5MjkzOTQ5NTk2OTc5ODk5OWE5YjljOWQ5ZTlmIiwiZm9ybWF0VmVyc2lvbiI6IjIuMCIsInNsb3RzIjpbeyJmaW5nZXJwcmludCI6Ijg5Yzc0NjA0NTJlZGRmZjEiLCJrZXkiOiJBZURoNHVQazVlYm42T25xNjFPVWhRb3NjSGxaT1V3dmMyNTM5Y3kvUEFyMjJtK0NrTEJlaEFKTnpscVJ6clByUnhIMjk4V2I4NDcvVVR1L2hnPT0iLCJrZXlyaW5nIjoiQWREUjB0UFUxZGJYMk5uYTIybzM1SEFQTWFlL2FKWGMxaWZhaVNiNXYxN0JqVktKZ2hNeGVlL3ZvT2lUa0NHelRCUEVYWmovNUc4cFNWNVlRQT09IiwidHlwZSI6ImxpYnJhcnkifV19CgL3/mXlgs5gQrMXTV3ZCSOw"
+    },
+    {
+      "name": "shorter than a chunk",
+      "length": 41,
+      "exportKey": "808182838485868788898a8b8c8d8e8f909192939495969798999a9b9c9d9e9f",
+      "exportId": "b0b1b2b3b4b5b6b7b8b9babbbcbdbebf",
+      "slotNonce": "000102030405060708090a0b",
+      "header": "{\"exportId\":\"b0b1b2b3b4b5b6b7b8b9babbbcbdbebf\",\"formatVersion\":\"2.0\",\"slots\":[{\"fingerprint\":\"89c7460452eddff1\",\"key\":\"AQABAgMEBQYHCAkKC1zqjRl2t2ii6Hjn7OwbQKA0/iDm6Tua8sJP3QV5fACn1ZqbNvhjqbIbieSRi5aPyQ==\",\"keyring\":\"AdDR0tPU1dbX2Nna22o35HAPMae/aJXc1ifaiSb5v17BjVKJghMxee/voOiTkCGzTBPEXZj/5G8pSV5YQA==\",\"type\":\"library\"}]}",
+      "streamKey": "5bc70a22d7c0f3df52c58908433d915a297a6b9fd34ad1f9c2ac6c0186271aff",
+      "size": 410,
+      "sha256": "6b8e75f177fdca2f3707544b8b41b5b2ae3c45919c3ad6340b43c2031d72fc7a",
+      "file": "Y2hyb25pY2xlcy1lbmNyeXB0ZWQtZXhwb3J0LzEKeyJleHBvcnRJZCI6ImIwYjFiMmIzYjRiNWI2YjdiOGI5YmFiYmJjYmRiZWJmIiwiZm9ybWF0VmVyc2lvbiI6IjIuMCIsInNsb3RzIjpbeyJmaW5nZXJwcmludCI6Ijg5Yzc0NjA0NTJlZGRmZjEiLCJrZXkiOiJBUUFCQWdNRUJRWUhDQWtLQzF6cWpSbDJ0MmlpNkhqbjdPd2JRS0EwL2lEbTZUdWE4c0pQM1FWNWZBQ24xWnFiTnZoanFiSWJpZVNSaTVhUHlRPT0iLCJrZXlyaW5nIjoiQWREUjB0UFUxZGJYMk5uYTIybzM1SEFQTWFlL2FKWGMxaWZhaVNiNXYxN0JqVktKZ2hNeGVlL3ZvT2lUa0NHelRCUEVYWmovNUc4cFNWNVlRQT09IiwidHlwZSI6ImxpYnJhcnkifV19CgKd6taVNzon6+jHsiC/+5EErEyy2eejnqd2BYf6l3IjpJp8qQw16Hp+yUMUlLGwOUmtcz03hlQRY+I="
+    },
+    {
+      "name": "two chunks and a bit",
+      "length": 131172,
+      "exportKey": "a0a1a2a3a4a5a6a7a8a9aaabacadaeafb0b1b2b3b4b5b6b7b8b9babbbcbdbebf",
+      "exportId": "d0d1d2d3d4d5d6d7d8d9dadbdcdddedf",
+      "slotNonce": "202122232425262728292a2b",
+      "header": "{\"exportId\":\"d0d1d2d3d4d5d6d7d8d9dadbdcdddedf\",\"formatVersion\":\"2.0\",\"slots\":[{\"fingerprint\":\"89c7460452eddff1\",\"key\":\"ASAhIiMkJSYnKCkqKy9irKJCxDVpfkMT1Yc7leV5oyAXEA//y74yJHA0+OIHfr7oO/E25ENyeORRdmhXWw==\",\"keyring\":\"AdDR0tPU1dbX2Nna22o35HAPMae/aJXc1ifaiSb5v17BjVKJghMxee/voOiTkCGzTBPEXZj/5G8pSV5YQA==\",\"type\":\"library\"}]}",
+      "streamKey": "7ddd979a068305fe586931b49ffea3cc50e775672bb5cda63c1f2a2883f39a7a",
+      "size": 131573,
+      "sha256": "fd56dfb1d430e3144c4c3ec40301916eec6f31bdf9fbcd9f4abc925e84ddfc19"
+    }
+  ],
+  "tampered": [
+    {
+      "name": "header edited after sealing",
+      "file": "Y2hyb25pY2xlcy1lbmNyeXB0ZWQtZXhwb3J0LzEKeyJleHBvcnRJZCI6ImIwYjFiMmIzYjRiNWI2YjdiOGI5YmFiYmJjYmRiZWJmIiwiZm9ybWF0VmVyc2lvbiI6IjIuMSIsInNsb3RzIjpbeyJmaW5nZXJwcmludCI6Ijg5Yzc0NjA0NTJlZGRmZjEiLCJrZXkiOiJBUUFCQWdNRUJRWUhDQWtLQzF6cWpSbDJ0MmlpNkhqbjdPd2JRS0EwL2lEbTZUdWE4c0pQM1FWNWZBQ24xWnFiTnZoanFiSWJpZVNSaTVhUHlRPT0iLCJrZXlyaW5nIjoiQWREUjB0UFUxZGJYMk5uYTIybzM1SEFQTWFlL2FKWGMxaWZhaVNiNXYxN0JqVktKZ2hNeGVlL3ZvT2lUa0NHelRCUEVYWmovNUc4cFNWNVlRQT09IiwidHlwZSI6ImxpYnJhcnkifV19CgKd6taVNzon6+jHsiC/+5EErEyy2eejnqd2BYf6l3IjpJp8qQw16Hp+yUMUlLGwOUmtcz03hlQRY+I=",
+      "with": "libraryKey",
+      "fails": "stream"
+    },
+    {
+      "name": "slot from another export",
+      "file": "Y2hyb25pY2xlcy1lbmNyeXB0ZWQtZXhwb3J0LzEKeyJleHBvcnRJZCI6ImIwYjFiMmIzYjRiNWI2YjdiOGI5YmFiYmJjYmRiZWJmIiwiZm9ybWF0VmVyc2lvbiI6IjIuMCIsInNsb3RzIjpbeyJmaW5nZXJwcmludCI6Ijg5Yzc0NjA0NTJlZGRmZjEiLCJrZXkiOiJBZURoNHVQazVlYm42T25xNjFPVWhRb3NjSGxaT1V3dmMyNTM5Y3kvUEFyMjJtK0NrTEJlaEFKTnpscVJ6clByUnhIMjk4V2I4NDcvVVR1L2hnPT0iLCJrZXlyaW5nIjoiQWREUjB0UFUxZGJYMk5uYTIybzM1SEFQTWFlL2FKWGMxaWZhaVNiNXYxN0JqVktKZ2hNeGVlL3ZvT2lUa0NHelRCUEVYWmovNUc4cFNWNVlRQT09IiwidHlwZSI6ImxpYnJhcnkifV19CgKd6taVNzon6+jHsiC/+5EErEyy2eejnqd2BYf6l3IjpJp8qQw16Hp+yUMUlLGwOUmtcz03hlQRY+I=",
+      "with": "libraryKey",
+      "fails": "slot"
+    },
+    {
+      "name": "export id changed",
+      "file": "Y2hyb25pY2xlcy1lbmNyeXB0ZWQtZXhwb3J0LzEKeyJleHBvcnRJZCI6IjAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwIiwiZm9ybWF0VmVyc2lvbiI6IjIuMCIsInNsb3RzIjpbeyJmaW5nZXJwcmludCI6Ijg5Yzc0NjA0NTJlZGRmZjEiLCJrZXkiOiJBUUFCQWdNRUJRWUhDQWtLQzF6cWpSbDJ0MmlpNkhqbjdPd2JRS0EwL2lEbTZUdWE4c0pQM1FWNWZBQ24xWnFiTnZoanFiSWJpZVNSaTVhUHlRPT0iLCJrZXlyaW5nIjoiQWREUjB0UFUxZGJYMk5uYTIybzM1SEFQTWFlL2FKWGMxaWZhaVNiNXYxN0JqVktKZ2hNeGVlL3ZvT2lUa0NHelRCUEVYWmovNUc4cFNWNVlRQT09IiwidHlwZSI6ImxpYnJhcnkifV19CgKd6taVNzon6+jHsiC/+5EErEyy2eejnqd2BYf6l3IjpJp8qQw16Hp+yUMUlLGwOUmtcz03hlQRY+I=",
+      "with": "libraryKey",
+      "fails": "slot"
+    },
+    {
+      "name": "wrong recovery code",
+      "file": "Y2hyb25pY2xlcy1lbmNyeXB0ZWQtZXhwb3J0LzEKeyJleHBvcnRJZCI6ImIwYjFiMmIzYjRiNWI2YjdiOGI5YmFiYmJjYmRiZWJmIiwiZm9ybWF0VmVyc2lvbiI6IjIuMCIsInNsb3RzIjpbeyJmaW5nZXJwcmludCI6Ijg5Yzc0NjA0NTJlZGRmZjEiLCJrZXkiOiJBUUFCQWdNRUJRWUhDQWtLQzF6cWpSbDJ0MmlpNkhqbjdPd2JRS0EwL2lEbTZUdWE4c0pQM1FWNWZBQ24xWnFiTnZoanFiSWJpZVNSaTVhUHlRPT0iLCJrZXlyaW5nIjoiQWREUjB0UFUxZGJYMk5uYTIybzM1SEFQTWFlL2FKWGMxaWZhaVNiNXYxN0JqVktKZ2hNeGVlL3ZvT2lUa0NHelRCUEVYWmovNUc4cFNWNVlRQT09IiwidHlwZSI6ImxpYnJhcnkifV19CgKd6taVNzon6+jHsiC/+5EErEyy2eejnqd2BYf6l3IjpJp8qQw16Hp+yUMUlLGwOUmtcz03hlQRY+I=",
+      "with": {
+        "recoveryCode": "G618-7145-GT3R-H2CA-HE68-V3MF-J28S-54WM"
+      },
+      "fails": "slot"
+    },
+    {
+      "name": "another library's key",
+      "file": "Y2hyb25pY2xlcy1lbmNyeXB0ZWQtZXhwb3J0LzEKeyJleHBvcnRJZCI6ImIwYjFiMmIzYjRiNWI2YjdiOGI5YmFiYmJjYmRiZWJmIiwiZm9ybWF0VmVyc2lvbiI6IjIuMCIsInNsb3RzIjpbeyJmaW5nZXJwcmludCI6Ijg5Yzc0NjA0NTJlZGRmZjEiLCJrZXkiOiJBUUFCQWdNRUJRWUhDQWtLQzF6cWpSbDJ0MmlpNkhqbjdPd2JRS0EwL2lEbTZUdWE4c0pQM1FWNWZBQ24xWnFiTnZoanFiSWJpZVNSaTVhUHlRPT0iLCJrZXlyaW5nIjoiQWREUjB0UFUxZGJYMk5uYTIybzM1SEFQTWFlL2FKWGMxaWZhaVNiNXYxN0JqVktKZ2hNeGVlL3ZvT2lUa0NHelRCUEVYWmovNUc4cFNWNVlRQT09IiwidHlwZSI6ImxpYnJhcnkifV19CgKd6taVNzon6+jHsiC/+5EErEyy2eejnqd2BYf6l3IjpJp8qQw16Hp+yUMUlLGwOUmtcz03hlQRY+I=",
+      "with": {
+        "libraryKey": "1112131415161718191a1b1c1d1e1f202122232425262728292a2b2c2d2e2f30"
+      },
+      "fails": "slot"
+    },
+    {
+      "name": "only a slot type it doesn't know",
+      "file": "Y2hyb25pY2xlcy1lbmNyeXB0ZWQtZXhwb3J0LzEKeyJleHBvcnRJZCI6ImIwYjFiMmIzYjRiNWI2YjdiOGI5YmFiYmJjYmRiZWJmIiwiZm9ybWF0VmVyc2lvbiI6IjIuMCIsInNsb3RzIjpbeyJmaW5nZXJwcmludCI6Ijg5Yzc0NjA0NTJlZGRmZjEiLCJrZXkiOiJBUUFCQWdNRUJRWUhDQWtLQzF6cWpSbDJ0MmlpNkhqbjdPd2JRS0EwL2lEbTZUdWE4c0pQM1FWNWZBQ24xWnFiTnZoanFiSWJpZVNSaTVhUHlRPT0iLCJrZXlyaW5nIjoiQWREUjB0UFUxZGJYMk5uYTIybzM1SEFQTWFlL2FKWGMxaWZhaVNiNXYxN0JqVktKZ2hNeGVlL3ZvT2lUa0NHelRCUEVYWmovNUc4cFNWNVlRQT09IiwidHlwZSI6InBhc3NwaHJhc2UifV19CgKd6taVNzon6+jHsiC/+5EErEyy2eejnqd2BYf6l3IjpJp8qQw16Hp+ySb9Jns4rAPRH572jaNOKlY=",
+      "with": "libraryKey",
+      "fails": "slot"
+    },
+    {
+      "name": "unknown major format version",
+      "file": "Y2hyb25pY2xlcy1lbmNyeXB0ZWQtZXhwb3J0LzEKeyJleHBvcnRJZCI6ImIwYjFiMmIzYjRiNWI2YjdiOGI5YmFiYmJjYmRiZWJmIiwiZm9ybWF0VmVyc2lvbiI6IjMuMCIsInNsb3RzIjpbeyJmaW5nZXJwcmludCI6Ijg5Yzc0NjA0NTJlZGRmZjEiLCJrZXkiOiJBUUFCQWdNRUJRWUhDQWtLQzF6cWpSbDJ0MmlpNkhqbjdPd2JRS0EwL2lEbTZUdWE4c0pQM1FWNWZBQ24xWnFiTnZoanFiSWJpZVNSaTVhUHlRPT0iLCJrZXlyaW5nIjoiQWREUjB0UFUxZGJYMk5uYTIybzM1SEFQTWFlL2FKWGMxaWZhaVNiNXYxN0JqVktKZ2hNeGVlL3ZvT2lUa0NHelRCUEVYWmovNUc4cFNWNVlRQT09IiwidHlwZSI6ImxpYnJhcnkifV19CgKd6taVNzon6+jHsiC/+5EErEyy2eejnqd2BYf6l3IjpJp8qQw16Hp+yau7MAHZiOZuj85BQiacemY=",
+      "with": "libraryKey",
+      "fails": "header"
+    },
+    {
+      "name": "a later magic version",
+      "file": "Y2hyb25pY2xlcy1lbmNyeXB0ZWQtZXhwb3J0LzIKeyJleHBvcnRJZCI6ImIwYjFiMmIzYjRiNWI2YjdiOGI5YmFiYmJjYmRiZWJmIiwiZm9ybWF0VmVyc2lvbiI6IjIuMCIsInNsb3RzIjpbeyJmaW5nZXJwcmludCI6Ijg5Yzc0NjA0NTJlZGRmZjEiLCJrZXkiOiJBUUFCQWdNRUJRWUhDQWtLQzF6cWpSbDJ0MmlpNkhqbjdPd2JRS0EwL2lEbTZUdWE4c0pQM1FWNWZBQ24xWnFiTnZoanFiSWJpZVNSaTVhUHlRPT0iLCJrZXlyaW5nIjoiQWREUjB0UFUxZGJYMk5uYTIybzM1SEFQTWFlL2FKWGMxaWZhaVNiNXYxN0JqVktKZ2hNeGVlL3ZvT2lUa0NHelRCUEVYWmovNUc4cFNWNVlRQT09IiwidHlwZSI6ImxpYnJhcnkifV19CgKd6taVNzon6+jHsiC/+5EErEyy2eejnqd2BYf6l3IjpJp8qQw16Hp+yUMUlLGwOUmtcz03hlQRY+I=",
+      "with": "libraryKey",
+      "fails": "magic"
+    },
+    {
+      "name": "stream from another export",
+      "file": "Y2hyb25pY2xlcy1lbmNyeXB0ZWQtZXhwb3J0LzEKeyJleHBvcnRJZCI6ImIwYjFiMmIzYjRiNWI2YjdiOGI5YmFiYmJjYmRiZWJmIiwiZm9ybWF0VmVyc2lvbiI6IjIuMCIsInNsb3RzIjpbeyJmaW5nZXJwcmludCI6Ijg5Yzc0NjA0NTJlZGRmZjEiLCJrZXkiOiJBUUFCQWdNRUJRWUhDQWtLQzF6cWpSbDJ0MmlpNkhqbjdPd2JRS0EwL2lEbTZUdWE4c0pQM1FWNWZBQ24xWnFiTnZoanFiSWJpZVNSaTVhUHlRPT0iLCJrZXlyaW5nIjoiQWREUjB0UFUxZGJYMk5uYTIybzM1SEFQTWFlL2FKWGMxaWZhaVNiNXYxN0JqVktKZ2hNeGVlL3ZvT2lUa0NHelRCUEVYWmovNUc4cFNWNVlRQT09IiwidHlwZSI6ImxpYnJhcnkifV19CgL3/mXlgs5gQrMXTV3ZCSOw",
+      "with": "libraryKey",
+      "fails": "stream"
+    },
+    {
+      "name": "stream cut inside its last chunk",
+      "file": "Y2hyb25pY2xlcy1lbmNyeXB0ZWQtZXhwb3J0LzEKeyJleHBvcnRJZCI6ImIwYjFiMmIzYjRiNWI2YjdiOGI5YmFiYmJjYmRiZWJmIiwiZm9ybWF0VmVyc2lvbiI6IjIuMCIsInNsb3RzIjpbeyJmaW5nZXJwcmludCI6Ijg5Yzc0NjA0NTJlZGRmZjEiLCJrZXkiOiJBUUFCQWdNRUJRWUhDQWtLQzF6cWpSbDJ0MmlpNkhqbjdPd2JRS0EwL2lEbTZUdWE4c0pQM1FWNWZBQ24xWnFiTnZoanFiSWJpZVNSaTVhUHlRPT0iLCJrZXlyaW5nIjoiQWREUjB0UFUxZGJYMk5uYTIybzM1SEFQTWFlL2FKWGMxaWZhaVNiNXYxN0JqVktKZ2hNeGVlL3ZvT2lUa0NHelRCUEVYWmovNUc4cFNWNVlRQT09IiwidHlwZSI6ImxpYnJhcnkifV19CgKd6taVNzon6+jHsiC/+5EErEyy2eejnqd2BYf6l3IjpJp8qQw16Hp+yUMUlLGwOUmtcz03hlQRYw==",
+      "with": "recoveryCode",
+      "fails": "stream"
+    },
+    {
+      "name": "bytes after the last chunk",
+      "file": "Y2hyb25pY2xlcy1lbmNyeXB0ZWQtZXhwb3J0LzEKeyJleHBvcnRJZCI6ImIwYjFiMmIzYjRiNWI2YjdiOGI5YmFiYmJjYmRiZWJmIiwiZm9ybWF0VmVyc2lvbiI6IjIuMCIsInNsb3RzIjpbeyJmaW5nZXJwcmludCI6Ijg5Yzc0NjA0NTJlZGRmZjEiLCJrZXkiOiJBUUFCQWdNRUJRWUhDQWtLQzF6cWpSbDJ0MmlpNkhqbjdPd2JRS0EwL2lEbTZUdWE4c0pQM1FWNWZBQ24xWnFiTnZoanFiSWJpZVNSaTVhUHlRPT0iLCJrZXlyaW5nIjoiQWREUjB0UFUxZGJYMk5uYTIybzM1SEFQTWFlL2FKWGMxaWZhaVNiNXYxN0JqVktKZ2hNeGVlL3ZvT2lUa0NHelRCUEVYWmovNUc4cFNWNVlRQT09IiwidHlwZSI6ImxpYnJhcnkifV19CgKd6taVNzon6+jHsiC/+5EErEyy2eejnqd2BYf6l3IjpJp8qQw16Hp+yUMUlLGwOUmtcz03hlQRY+LJQxSUsbA5Sa1zPTeGVBFj4g==",
+      "with": "libraryKey",
+      "fails": "stream"
+    },
+    {
+      "name": "flipped bit in the stream",
+      "file": "Y2hyb25pY2xlcy1lbmNyeXB0ZWQtZXhwb3J0LzEKeyJleHBvcnRJZCI6ImIwYjFiMmIzYjRiNWI2YjdiOGI5YmFiYmJjYmRiZWJmIiwiZm9ybWF0VmVyc2lvbiI6IjIuMCIsInNsb3RzIjpbeyJmaW5nZXJwcmludCI6Ijg5Yzc0NjA0NTJlZGRmZjEiLCJrZXkiOiJBUUFCQWdNRUJRWUhDQWtLQzF6cWpSbDJ0MmlpNkhqbjdPd2JRS0EwL2lEbTZUdWE4c0pQM1FWNWZBQ24xWnFiTnZoanFiSWJpZVNSaTVhUHlRPT0iLCJrZXlyaW5nIjoiQWREUjB0UFUxZGJYMk5uYTIybzM1SEFQTWFlL2FKWGMxaWZhaVNiNXYxN0JqVktKZ2hNeGVlL3ZvT2lUa0NHelRCUEVYWmovNUc4cFNWNVlRQT09IiwidHlwZSI6ImxpYnJhcnkifV19CgKd6taVNjon6+jHsiC/+5EErEyy2eejnqd2BYf6l3IjpJp8qQw16Hp+yUMUlLGwOUmtcz03hlQRY+I=",
+      "with": "libraryKey",
+      "fails": "stream"
+    }
+  ]
+}
