@@ -66,17 +66,19 @@ A domain's **key id** is `<journal ID>.<generation>` (journal IDs are
 Derived keys use HKDF-SHA256 with an empty salt and these `info` strings. A
 key is used only through its derived keys, never directly:
 
-| Key                   | IKM           | info                                      |
-| --------------------- | ------------- | ----------------------------------------- |
-| Library record key    | LK            | `chronicles.v1 library`                   |
-| Library revision key  | LK            | `chronicles.v1 revision`                  |
-| Record key            | JK            | `chronicles.v1 records`                   |
-| Revision key          | JK            | `chronicles.v1 revision`                  |
-| Attachment name key   | JK            | `chronicles.v1 attachment-name`           |
-| Attachment file key   | JK            | `chronicles.v1 attachment-file \|` + name |
-| Recovery wrapping key | recovery code | `chronicles.v1 recovery`                  |
+| Key                   | IKM           | info                                       |
+| --------------------- | ------------- | ------------------------------------------ |
+| Library record key    | LK            | `chronicles.v1 library`                    |
+| Library revision key  | LK            | `chronicles.v1 revision`                   |
+| Record key            | JK            | `chronicles.v1 records`                    |
+| Revision key          | JK            | `chronicles.v1 revision`                   |
+| Attachment name key   | JK            | `chronicles.v1 attachment-name`            |
+| Attachment stream key | JK            | `chronicles.v1 attachment-stream\|` + name |
+| Attachment file key   | JK            | `chronicles.v1 attachment-file \|` + name  |
+| Recovery wrapping key | recovery code | `chronicles.v1 recovery`                   |
 
-`name` is the attachment's `<sha256><ext>`. The **fingerprint** is the first
+`name` is the attachment's `<sha256><ext>`. The attachment file key is read
+only, for files sealed before streams (below). The **fingerprint** is the first
 8 bytes of SHA-256 of LK, in lowercase hex: it names the key without revealing it.
 
 ## Envelope
@@ -97,6 +99,50 @@ AAD = "chronicles.v1|" ‖ kind ‖ "|" ‖ record id ‖ "|" ‖ key id
 
 `key id` is a domain's key id, `library`, or `recovery`. In a text field the
 envelope is standard base64 with padding.
+
+## Attachment files
+
+An attachment file is sealed as a **stream**, a chunk at a time, so a device
+seals and opens it from file to file and its memory doesn't grow with the
+file (a video can be hundreds of megabytes; a phone app that holds one in
+memory is killed):
+
+```
+stream = 0x02 ‖ chunk₀ ‖ chunk₁ ‖ … ‖ chunkₙ
+chunkᵢ = AES-256-GCM(stream key, nonceᵢ, plaintextᵢ, AAD) = ciphertext ‖ tag (16 bytes)
+nonceᵢ = i as 11 bytes, big-endian ‖ 0x01 if chunk i is the last, else 0x00
+```
+
+- Plaintext chunks are 65,536 bytes; the last holds the rest, 1 to 65,536
+  bytes. An empty file is one empty last chunk. So every chunk but the last
+  is 65,552 bytes sealed, and a reader finds the boundaries without a length
+  field: the last chunk is whatever is left.
+- The stream key is the attachment stream key for the file's name. The AAD
+  is the record's (kind `attachment`, its record id, the domain's key id),
+  the same for every chunk.
+- Each chunk's index and whether it is the last are in its nonce. A chunk
+  moved, dropped, or repeated fails to open; so does a stream cut off at a
+  chunk boundary (its last chunk isn't marked last), one with bytes after its
+  last chunk, and one with no chunk at all.
+- A reader writes the plaintext to a temporary file and keeps it only once
+  the last chunk has opened and the bytes hash to the name. A stream that
+  fails partway leaves nothing behind.
+- **Deterministic.** Each stream key encrypts exactly one plaintext (it is
+  per domain and per file, and the name is the file's hash), so counter
+  nonces never repeat under a key, and the same file sealed twice in a domain
+  gives the same bytes. The stream key is derived apart from the attachment
+  file key, so a file sealed both ways never reuses a key and nonce.
+
+Readers also open files sealed before streams: one `0x01` envelope under the
+attachment file key with an all-zero nonce. Writers send streams.
+
+**An envelope version a device can't read** (an older app meeting a stream,
+or any app meeting a later version) makes that record unreadable there, never
+damaged: the device skips it, stores nothing, logs it, and doesn't send a
+replacement, so it can't overwrite the record with one in a format others
+can't read either. A note that uses the file shows it missing on that device
+until a version of the app that reads the format fetches the record again.
+Update every device before turning encryption on.
 
 ## Records
 
@@ -127,9 +173,8 @@ adds a plaintext `keyId` field naming the domain (or `library`).
   the file, named `<journal ID>.<hmac>` with `<hmac>` =
   `HMAC-SHA256(domain attachment name key, name)` in lowercase hex. A file used
   in two journals is stored twice; that is the price of unlinkable domains. An
-  attachment no note uses isn't sent. Each file is encrypted under its own file
-  key with an all-zero nonce, which is safe because each key encrypts exactly
-  one plaintext, and makes the upload deterministic within a domain. The
+  attachment no note uses isn't sent. The file is a stream
+  ([Attachment files](#attachment-files)), deterministic within a domain. The
   record's text field holds the `name` as an envelope under the domain record
   key (same AAD as the file); a reader checks it against the record id and the
   bytes' hash.
@@ -160,7 +205,17 @@ adds a plaintext `keyId` field naming the domain (or `library`).
   a zone that has a keyring: a joining device sends nothing until its first
   fetch has finished, and one that learns mid-fetch that the library is
   encrypted forgets what it applied and fetches again with the key.
-- **Turning off** is the same as turning on, in reverse, and needs LK.
+- **No turning off.** Once encrypted, a library's synced copy stays
+  encrypted: there is no path that sends it back as plaintext. Plaintext
+  copies come from export, or from a tool that holds the key. A new library
+  is encrypted from the start, when sync is first turned on.
+- **Removing the library from iCloud** deletes the zone and retires the
+  keys: the device forgets its keyring, journal keys, and sync state, and
+  removes LK from the keychain. Every other device sees the zone go and stops
+  (sync.md); local libraries are untouched. Turning sync on again makes a new
+  library under a new LK and recovery code. This is the reset for a sync
+  problem, a lost recovery code while a device still has the data, or a key
+  that may have leaked.
 
 ## Journal access (later)
 
@@ -196,3 +251,11 @@ migration, only new slot types and a new generation of the affected journals.
 An implementation passes when it derives every key, fingerprint, HMAC, and
 envelope byte for byte, opens each envelope to its plaintext, and refuses each
 `tampered` case.
+
+`streams` holds attachment files: each case's plaintext is `length` bytes
+where byte i is `i % 251`, sealed under `streams.key` and `streams.aad`; the
+stream must have the given `size` and `sha256` (and, when short, be
+`envelope`) and open back to the plaintext. Each of `streams.tampered` is
+byte ranges of the case named by `from`, joined in order, with the bit at
+byte `flip` flipped if given; opened under its `key` and `aad` (the stream's
+when absent), it must fail, and leave no plaintext.

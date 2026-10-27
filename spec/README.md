@@ -45,7 +45,7 @@ vectors/
   sync/<area>.json           multi-device scenarios over one server (see sync.md)
   activity/cases.json        library changes in → activity log out (see activity.md)
   versions/cases.json        note writes in → each note's versions out (see versions.md)
-  encryption/cases.json      fixed keys and nonces → derived keys, HMACs, envelopes
+  encryption/cases.json      fixed keys and nonces → derived keys, HMACs, envelopes, streams
                              (node scripts/encryption-vectors.mjs writes it)
 ```
 
@@ -73,8 +73,8 @@ An implementation passes a vector when:
 - **sync:** every scenario passes (see [sync.md](sync.md#vectors)).
 - **activity:** every case's log matches (see [activity.md](activity.md#vectors)).
 - **versions:** every case's versions match (see [versions.md](versions.md#vectors)).
-- **encryption:** every derivation and envelope matches, and every tampered
-  envelope is refused (see [encryption.md](encryption.md#vectors)).
+- **encryption:** every derivation, envelope, and stream matches, and every tampered
+  envelope or stream is refused (see [encryption.md](encryption.md#vectors)).
 
 In this repo, `yarn test:node` runs every vector except `theme/`, `sync/`, `activity/`, `versions/`, and `encryption/`
 (`src/node-client/spec-vectors.test.ts`); the Swift app runs those. To regenerate after an intentional

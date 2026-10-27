@@ -24,7 +24,8 @@
   "attachment": {
     "name": "9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08.png",
     "recordId": "03aq5qh9copxys3mzz5l8q60f.de823315ff0ad823184be2e8f0830b2dee6174afae42fb170c6b982d23fe156a",
-    "fileKey": "ef5457b157e0468dd8beabdaa49ddbd567244b9de8df46cec58200171abb6749"
+    "fileKey": "ef5457b157e0468dd8beabdaa49ddbd567244b9de8df46cec58200171abb6749",
+    "streamKey": "f970404909636149b801d347fb800aaca57bd82a0c3fb3545a8215f2d34b2b58"
   },
   "keyRecord": {
     "payload": "{\"generation\":1,\"slots\":[{\"key\":\"AcDBwsPExcbHyMnKy5j0qtCxyQGNtLnONfRCz4pIUUAEpMi244q+wrS5acZ/owhVH2QfH86JcTzk6MbV1Q==\",\"type\":\"library\"}]}",
@@ -144,5 +145,175 @@
       },
       "envelope": "AqChoqOkpaanqKmqq+Zp6apDyNPQOfmli9UKrsVeY9JnmMvDosbL+bHuURaouS9jWrx2Gzbkd1I0CFpW46Z4utUYargcpA5lvcNJdndnDpGkXeYFDLXSGBszFYjKufT8KEf+j+lkcfir2O0kS1d9aCYhWWdr9J8OoA5XHkxaqc7I0Xunu5toSA6yJREJVcVG4el2luqZZiEraXFSY3efe614pUUwZoHiP2i7JJanoKm/xoxzLX82Qyx/hYEp2Wsg+b85rpmVFvb9guYDSO5R/TOxRelrlrb0kR/FfUOI7HVw5jMHDChNjjJW8FCb2McJUaejBX0nXfsUJwevln+JOKko3kShDnE/aDkVrT8me2hq"
     }
-  ]
+  ],
+  "streams": {
+    "chunkSize": 65536,
+    "plaintext": "byte i is i % 251",
+    "key": "f970404909636149b801d347fb800aaca57bd82a0c3fb3545a8215f2d34b2b58",
+    "aad": {
+      "kind": "attachment",
+      "id": "03aq5qh9copxys3mzz5l8q60f.de823315ff0ad823184be2e8f0830b2dee6174afae42fb170c6b982d23fe156a",
+      "keyId": "03aq5qh9copxys3mzz5l8q60f.1"
+    },
+    "cases": [
+      {
+        "name": "empty file",
+        "length": 0,
+        "size": 17,
+        "sha256": "580d595e71905e62316faf1d8992a64bc857ef03ec79a4e91ed09d2813376d62",
+        "envelope": "Ar8TlSo7AObrZ0cY6bUBtOY="
+      },
+      {
+        "name": "shorter than a chunk",
+        "length": 41,
+        "size": 58,
+        "sha256": "2bce9ed545e693af0cb7d9407d06f2e8dac232ec325ad4ad5a545517d4c6e111",
+        "envelope": "AtxbSSPLJnXELiVXJMkDhbdsagjPW+/PtgNTdD29UOeDipiiAk2f2J6WYYKsJzfw8HCjPSka6F45iQ=="
+      },
+      {
+        "name": "exactly one chunk",
+        "length": 65536,
+        "size": 65553,
+        "sha256": "044d8b4130f7240bf7aff1cef7b4eba117d0969b96225896174e62857d0f44b3"
+      },
+      {
+        "name": "exactly two chunks",
+        "length": 131072,
+        "size": 131105,
+        "sha256": "f19816ed3cdb892da6417c02243409c6a8955645949a903675627537a355db50"
+      },
+      {
+        "name": "two chunks and a bit",
+        "length": 131172,
+        "size": 131221,
+        "sha256": "059462edbca96bae56e948bef68b4a70863fce60d8ff3656b0290791bdeda3d7"
+      }
+    ],
+    "tampered": [
+      {
+        "from": "two chunks and a bit",
+        "name": "last chunk dropped",
+        "ranges": [
+          [
+            0,
+            131105
+          ]
+        ],
+        "sha256": "436e1f1c52f62fc8f33f50e870c9c60f259247975788d6f166c8251d73afcc69"
+      },
+      {
+        "from": "two chunks and a bit",
+        "name": "cut inside the last chunk",
+        "ranges": [
+          [
+            0,
+            131220
+          ]
+        ],
+        "sha256": "a340bba8da498a8f1d25aa0f08d427e1f2347af2b4efdc32f36019cbf02c02cc"
+      },
+      {
+        "from": "two chunks and a bit",
+        "name": "chunks swapped",
+        "ranges": [
+          [
+            0,
+            1
+          ],
+          [
+            65553,
+            131105
+          ],
+          [
+            1,
+            65553
+          ],
+          [
+            131105,
+            131221
+          ]
+        ],
+        "sha256": "da1c47c749d0bbad991fd62b0edf8880061574f2ec20849beefb44c364abe0f2"
+      },
+      {
+        "from": "two chunks and a bit",
+        "name": "a chunk repeated",
+        "ranges": [
+          [
+            0,
+            65553
+          ],
+          [
+            1,
+            131221
+          ]
+        ],
+        "sha256": "b6e5775912054520d9d315ff30e14221587630b90e0fc65a5bdbc45d0cb39514"
+      },
+      {
+        "from": "two chunks and a bit",
+        "name": "bytes after the last chunk",
+        "ranges": [
+          [
+            0,
+            131221
+          ],
+          [
+            131204,
+            131221
+          ]
+        ],
+        "sha256": "307b661699af3f9d55a132ff8b934614788b96de0c6bcec135f547e1f415cd06"
+      },
+      {
+        "from": "two chunks and a bit",
+        "name": "only the version byte",
+        "ranges": [
+          [
+            0,
+            1
+          ]
+        ],
+        "sha256": "dbc1b4c900ffe48d575b5da5c638040125f65db0fe3e24494b76ea986457d986"
+      },
+      {
+        "from": "two chunks and a bit",
+        "name": "flipped bit in the second chunk",
+        "ranges": [
+          [
+            0,
+            131221
+          ]
+        ],
+        "flip": 65563,
+        "sha256": "5ad0a0426462e6f98efffbbda58f44712b050eae72726d7ddfe9d4cd4876a0ea"
+      },
+      {
+        "name": "moved to another attachment record",
+        "from": "two chunks and a bit",
+        "ranges": [
+          [
+            0,
+            131221
+          ]
+        ],
+        "aad": {
+          "kind": "attachment",
+          "id": "03aq5qh9copxys3mzz5l8q60f.0000000000000000000000000000000000000000000000000000000000000000",
+          "keyId": "03aq5qh9copxys3mzz5l8q60f.1"
+        }
+      },
+      {
+        "name": "opened with the 0x01 file key",
+        "from": "two chunks and a bit",
+        "ranges": [
+          [
+            0,
+            131221
+          ]
+        ],
+        "key": "ef5457b157e0468dd8beabdaa49ddbd567244b9de8df46cec58200171abb6749"
+      }
+    ]
+  }
 }
