@@ -1,0 +1,157 @@
+{
+  "description": "Search text in, NoteQuery out (see search.md). A query field left out is empty; unknownJournals is left out when empty.",
+  "journals": [
+    { "id": "jwork", "name": "work" },
+    { "id": "jblog", "name": "old blog" },
+    { "id": "jgarden", "name": "Garden" },
+    { "id": "jold", "name": "old" }
+  ],
+  "cases": [
+    { "name": "empty", "text": "", "query": {} },
+    { "name": "whitespace only", "text": "  \t\n ", "query": {} },
+    { "name": "words", "text": "soup  recipe", "query": { "texts": ["soup", "recipe"] } },
+    {
+      "name": "phrase",
+      "text": "\"exact phrase\" roadmap",
+      "query": { "texts": ["exact phrase", "roadmap"] }
+    },
+    {
+      "name": "phrase still open at the end",
+      "text": "garden \"open phrase",
+      "query": { "texts": ["garden", "open phrase"] }
+    },
+    {
+      "name": "quote inside a word starts a phrase",
+      "text": "soup\"stock pot\"",
+      "query": { "texts": ["soup", "stock pot"] }
+    },
+    { "name": "text operator", "text": "text:soup text:\"banana pudding\"", "query": { "texts": ["soup", "banana pudding"] } },
+    { "name": "tag", "text": "#idea", "query": { "tags": ["idea"] } },
+    { "name": "excluded tag", "text": "-#draft", "query": { "excludeTags": ["draft"] } },
+    {
+      "name": "tag operator",
+      "text": "tag:idea -tag:draft",
+      "query": { "tags": ["idea"], "excludeTags": ["draft"] }
+    },
+    { "name": "tags keep their case", "text": "#Idea #idea", "query": { "tags": ["Idea", "idea"] } },
+    { "name": "journal", "text": "in:work", "query": { "journalIds": ["jwork"] } },
+    {
+      "name": "journal names ignore case",
+      "text": "in:WORK in:garden",
+      "query": { "journalIds": ["jwork", "jgarden"] }
+    },
+    { "name": "quoted journal name", "text": "in:\"old blog\"", "query": { "journalIds": ["jblog"] } },
+    {
+      "name": "quoted journal name still open",
+      "text": "in:\"old blog",
+      "query": { "journalIds": ["jblog"] }
+    },
+    {
+      "name": "unquoted name stops at the space",
+      "text": "in:old blog",
+      "query": { "journalIds": ["jold"], "texts": ["blog"] }
+    },
+    {
+      "name": "excluded journal",
+      "text": "-in:\"old blog\" -in:work",
+      "query": { "excludeJournalIds": ["jblog", "jwork"] }
+    },
+    {
+      "name": "unknown journal",
+      "text": "in:nowhere soup",
+      "query": { "texts": ["soup"] },
+      "unknownJournals": ["nowhere"]
+    },
+    {
+      "name": "journal being typed",
+      "text": "in:wo",
+      "query": {},
+      "unknownJournals": ["wo"]
+    },
+    {
+      "name": "known and unknown journals",
+      "text": "in:work in:\"no such\" in:nowhere in:NOWHERE",
+      "query": { "journalIds": ["jwork"] },
+      "unknownJournals": ["no such", "nowhere", "NOWHERE"]
+    },
+    {
+      "name": "excluding an unknown journal is ignored",
+      "text": "-in:nowhere soup",
+      "query": { "texts": ["soup"] }
+    },
+    { "name": "title", "text": "title:plan", "query": { "titles": ["plan"] } },
+    {
+      "name": "quoted title",
+      "text": "title:\"status update\" notes",
+      "query": { "titles": ["status update"], "texts": ["notes"] }
+    },
+    { "name": "date", "text": "date:2024-01", "query": { "date": "2024-01" } },
+    {
+      "name": "before and after",
+      "text": "after:2023-06 before:2025",
+      "query": { "before": "2025", "after": "2023-06" }
+    },
+    {
+      "name": "a later date replaces an earlier one",
+      "text": "before:2025 before:2024-06 date:2020 date:2021-02-03",
+      "query": { "date": "2021-02-03", "before": "2024-06" }
+    },
+    {
+      "name": "invalid dates are ignored",
+      "text": "date:2024-1 before:yesterday after:2024-01-01T00 soup",
+      "query": { "texts": ["soup"] }
+    },
+    {
+      "name": "conflicted copies",
+      "text": "is:conflicted soup",
+      "query": { "titles": ["(conflicted copy)"], "texts": ["soup"] }
+    },
+    { "name": "other is: values are ignored", "text": "is:pinned is:con soup", "query": { "texts": ["soup"] } },
+    {
+      "name": "operators being typed are ignored",
+      "text": "garden # -# in: in:\"\" -in: tag: title: text: date: date:20 before: after:202 is:",
+      "query": { "texts": ["garden"] }
+    },
+    {
+      "name": "words without letters or digits are ignored",
+      "text": "- -- ... \"!?\" \"\"",
+      "query": {}
+    },
+    {
+      "name": "other colons are words",
+      "text": "10:30 foo:bar http://example.com",
+      "query": { "texts": ["10:30", "foo:bar", "http://example.com"] }
+    },
+    {
+      "name": "operator names ignore case",
+      "text": "In:\"OLD BLOG\" TITLE:plan -IN:work Date:2024 IS:conflicted Tag:x",
+      "query": {
+        "journalIds": ["jblog"],
+        "excludeJournalIds": ["jwork"],
+        "tags": ["x"],
+        "titles": ["plan", "(conflicted copy)"],
+        "date": "2024"
+      }
+    },
+    {
+      "name": "duplicates keep the first",
+      "text": "#a #a soup soup \"soup\" in:work in:WORK title:x title:x",
+      "query": { "journalIds": ["jwork"], "tags": ["a"], "titles": ["x"], "texts": ["soup"] }
+    },
+    {
+      "name": "everything",
+      "text": "in:work -in:Garden -#draft #idea title:plan date:2024-01 before:2025 after:2023-06 \"exact phrase\" roadmap",
+      "query": {
+        "journalIds": ["jwork"],
+        "excludeJournalIds": ["jgarden"],
+        "tags": ["idea"],
+        "excludeTags": ["draft"],
+        "titles": ["plan"],
+        "texts": ["exact phrase", "roadmap"],
+        "date": "2024-01",
+        "before": "2025",
+        "after": "2023-06"
+      }
+    }
+  ]
+}

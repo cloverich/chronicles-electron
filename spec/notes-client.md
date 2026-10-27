@@ -57,8 +57,9 @@ archived, noteCount}`. `NoteSummary` is `{id, journalId, title, createdAt}`.
   `cursor` pages: it is the id of the last note of the previous page, and
   keeps the notes after it in result order (`(createdAt, id) <` the
   cursor's); an unknown cursor matches nothing. `texts` is host full-text search:
-  each term must match the title or content; hosts may stem, so fixtures use
-  plain words.
+  each term must match the title or content, as a phrase whose last word may
+  be a prefix; hosts may stem, so fixtures use plain words. Search text
+  becomes a NoteQuery as [search.md](search.md) defines.
 - **Journals:** names are trimmed, 1–25 characters, not `_attachments`, without
   `/` or lone surrogates (`invalid_input`), and unique ignoring ASCII case
   (`conflict`; re-casing a journal's own name is allowed). The last journal

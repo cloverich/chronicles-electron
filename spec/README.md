@@ -14,6 +14,7 @@ Node code.
 | [export-format.md](export-format.md) | Export tree, single-file form, partial export, manifest, versions |
 | [derive.md](derive.md)               | Derived data (note links, image refs, FTS)                        |
 | [notes-client.md](notes-client.md)   | The NotesClient API contract and its fixtures                     |
+| [search.md](search.md)               | Search text: its syntax, the NoteQuery it becomes, and matching   |
 | [publish.md](publish.md)             | Projecting a note into a public bundle (a blog post)              |
 | [theme.md](theme.md)                 | Theme files: colors, note typography, and how overrides resolve   |
 | [sync.md](sync.md)                   | Records, change detection, and merge rules for syncing devices    |
@@ -46,6 +47,7 @@ vectors/
   sync/<area>.json           multi-device scenarios over one server (see sync.md)
   activity/cases.json        library changes in → activity log out (see activity.md)
   versions/cases.json        note writes in → each note's versions out (see versions.md)
+  search/cases.json          search text and journals in → NoteQuery out (see search.md)
   encryption/cases.json      fixed keys and nonces → derived keys, HMACs, envelopes, streams
                              (node scripts/encryption-vectors.mjs writes it)
 ```
@@ -74,6 +76,7 @@ An implementation passes a vector when:
 - **sync:** every scenario passes (see [sync.md](sync.md#vectors)).
 - **activity:** every case's log matches (see [activity.md](activity.md#vectors)).
 - **versions:** every case's versions match (see [versions.md](versions.md#vectors)).
+- **search:** every case's query matches (see [search.md](search.md#vectors)).
 - **encryption:** every derivation, envelope, and stream matches, and every tampered
   envelope or stream is refused (see [encryption.md](encryption.md#vectors)).
 

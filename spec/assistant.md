@@ -73,9 +73,14 @@ A tool the grant's access doesn't allow is not listed, and calling it fails
 `unsupported`.
 
 - **`journal`** is a visible journal's ID or its name (case-insensitive).
-- **`search_notes`:** `query` is the app's search syntax (`#tag`, `in:name`,
-  `date:2026-10`, `before:`, `after:`, words, quoted phrases). `from` and `to`
-  are dates (`YYYY-MM-DD`, UTC), inclusive, on `createdAt`. Newest first by
+- **`search_notes`:** `query` is the app's search syntax
+  ([search.md](search.md): words, quoted phrases, `#tag`, `-#tag`, `in:name`,
+  `in:"a name"`, `-in:`, `title:`, `date:2026-10`, `before:`, `after:`).
+  `journal`, `tag`, `from`, and `to` apply as their operators would written
+  after `query` ([search.md](search.md#parameters-beside-the-text)): `journal`
+  is `in:` (an unknown one fails `not_found`), `tag` is `#tag`, `from` is
+  `after:`, and `to` is `before:` the next day. `from` and `to` are dates
+  (`YYYY-MM-DD`, UTC), inclusive, on `createdAt`. Newest first by
   `createdAt`. `limit` defaults to 20, at most 100. `cursor` is a previous
   result's `nextCursor`.
 - **A row** has `id`, `title`, `journal` (name), `createdAt`, `updatedAt`,
