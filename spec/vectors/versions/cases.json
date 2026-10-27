@@ -1,0 +1,685 @@
+{
+  "cases": [
+    {
+      "name": "edits in one ten-minute window are one version",
+      "library": {
+        "journals": [
+          {
+            "id": "j1",
+            "name": "Personal"
+          }
+        ],
+        "notes": [
+          {
+            "id": "n1",
+            "journalId": "j1",
+            "title": "Groceries",
+            "content": "milk\n",
+            "tags": [
+              "home"
+            ],
+            "createdAt": "2026-07-01T09:00:00.000Z",
+            "updatedAt": "2026-09-01T09:00:00.000Z"
+          },
+          {
+            "id": "n2",
+            "journalId": "j1",
+            "title": "Standup",
+            "content": "notes\n",
+            "tags": [],
+            "createdAt": "2026-07-01T09:00:00.000Z",
+            "updatedAt": "2026-09-01T09:00:00.000Z"
+          }
+        ]
+      },
+      "steps": [
+        {
+          "at": "2026-10-01T10:00:00.000Z",
+          "op": "updateNote",
+          "id": "n1",
+          "content": "milk\neggs\n"
+        },
+        {
+          "at": "2026-10-01T10:04:00.000Z",
+          "op": "updateNote",
+          "id": "n1",
+          "content": "milk\neggs\nbread\n"
+        },
+        {
+          "at": "2026-10-01T10:13:00.000Z",
+          "op": "updateNote",
+          "id": "n1",
+          "content": "milk\neggs\nbread\nbutter\n"
+        },
+        {
+          "at": "2026-10-01T10:30:00.000Z",
+          "op": "updateNote",
+          "id": "n1",
+          "content": "milk\neggs\nbread\nbutter\njam\n"
+        }
+      ],
+      "expected": {
+        "n1": [
+          {
+            "at": "2026-10-01T10:30:00.000Z",
+            "origin": "user",
+            "title": "Groceries",
+            "content": "milk\neggs\nbread\nbutter\njam\n",
+            "pinned": false,
+            "parents": [
+              1
+            ]
+          },
+          {
+            "at": "2026-10-01T10:13:00.000Z",
+            "origin": "user",
+            "title": "Groceries",
+            "content": "milk\neggs\nbread\nbutter\n",
+            "pinned": false,
+            "parents": [
+              2
+            ]
+          },
+          {
+            "at": "2026-10-01T10:04:00.000Z",
+            "origin": "user",
+            "title": "Groceries",
+            "content": "milk\neggs\nbread\n",
+            "pinned": false,
+            "parents": [
+              3
+            ]
+          },
+          {
+            "at": "2026-09-01T09:00:00.000Z",
+            "origin": "existing",
+            "title": "Groceries",
+            "content": "milk\n",
+            "pinned": false,
+            "parents": []
+          }
+        ],
+        "n2": []
+      }
+    },
+    {
+      "name": "a pin replaces the newest version, and pinning an unversioned note writes none",
+      "library": {
+        "journals": [
+          {
+            "id": "j1",
+            "name": "Personal"
+          }
+        ],
+        "notes": [
+          {
+            "id": "n1",
+            "journalId": "j1",
+            "title": "Groceries",
+            "content": "milk\n",
+            "tags": [
+              "home"
+            ],
+            "createdAt": "2026-07-01T09:00:00.000Z",
+            "updatedAt": "2026-09-01T09:00:00.000Z"
+          },
+          {
+            "id": "n2",
+            "journalId": "j1",
+            "title": "Standup",
+            "content": "notes\n",
+            "tags": [],
+            "createdAt": "2026-07-01T09:00:00.000Z",
+            "updatedAt": "2026-09-01T09:00:00.000Z"
+          }
+        ]
+      },
+      "steps": [
+        {
+          "at": "2026-10-01T10:00:00.000Z",
+          "op": "updateNote",
+          "id": "n1",
+          "content": "milk\neggs\n"
+        },
+        {
+          "at": "2026-10-01T10:03:00.000Z",
+          "op": "pin",
+          "id": "n1",
+          "pinned": true
+        },
+        {
+          "at": "2026-10-01T10:05:00.000Z",
+          "op": "updateNote",
+          "id": "n1",
+          "content": "milk\neggs\nbread\n"
+        },
+        {
+          "at": "2026-10-01T10:40:00.000Z",
+          "op": "pin",
+          "id": "n2",
+          "pinned": true
+        }
+      ],
+      "expected": {
+        "n1": [
+          {
+            "at": "2026-10-01T10:05:00.000Z",
+            "origin": "user",
+            "title": "Groceries",
+            "content": "milk\neggs\nbread\n",
+            "pinned": true,
+            "parents": [
+              1
+            ]
+          },
+          {
+            "at": "2026-09-01T09:00:00.000Z",
+            "origin": "existing",
+            "title": "Groceries",
+            "content": "milk\n",
+            "pinned": false,
+            "parents": []
+          }
+        ],
+        "n2": []
+      }
+    },
+    {
+      "name": "other origins and restores don't coalesce",
+      "library": {
+        "journals": [
+          {
+            "id": "j1",
+            "name": "Personal"
+          }
+        ],
+        "notes": [
+          {
+            "id": "n1",
+            "journalId": "j1",
+            "title": "Groceries",
+            "content": "milk\n",
+            "tags": [
+              "home"
+            ],
+            "createdAt": "2026-07-01T09:00:00.000Z",
+            "updatedAt": "2026-09-01T09:00:00.000Z"
+          },
+          {
+            "id": "n2",
+            "journalId": "j1",
+            "title": "Standup",
+            "content": "notes\n",
+            "tags": [],
+            "createdAt": "2026-07-01T09:00:00.000Z",
+            "updatedAt": "2026-09-01T09:00:00.000Z"
+          }
+        ]
+      },
+      "steps": [
+        {
+          "at": "2026-10-01T10:00:00.000Z",
+          "op": "updateNote",
+          "id": "n1",
+          "content": "milk\neggs\n"
+        },
+        {
+          "at": "2026-10-01T10:02:00.000Z",
+          "origin": "sync",
+          "op": "updateNote",
+          "id": "n1",
+          "content": "milk\neggs\nbread\n"
+        },
+        {
+          "at": "2026-10-01T10:03:00.000Z",
+          "origin": "sync",
+          "op": "updateNote",
+          "id": "n1",
+          "content": "milk\neggs\nbread\nbutter\n"
+        },
+        {
+          "at": "2026-10-01T10:04:00.000Z",
+          "origin": "import",
+          "op": "updateNote",
+          "id": "n1",
+          "title": "Shopping"
+        },
+        {
+          "at": "2026-10-01T10:05:00.000Z",
+          "origin": "import",
+          "op": "updateNote",
+          "id": "n1",
+          "content": "milk\n"
+        }
+      ],
+      "expected": {
+        "n1": [
+          {
+            "at": "2026-10-01T10:05:00.000Z",
+            "origin": "import",
+            "title": "Shopping",
+            "content": "milk\n",
+            "pinned": false,
+            "parents": [
+              1
+            ]
+          },
+          {
+            "at": "2026-10-01T10:04:00.000Z",
+            "origin": "import",
+            "title": "Shopping",
+            "content": "milk\neggs\nbread\nbutter\n",
+            "pinned": false,
+            "parents": [
+              2
+            ]
+          },
+          {
+            "at": "2026-10-01T10:03:00.000Z",
+            "origin": "sync",
+            "title": "Groceries",
+            "content": "milk\neggs\nbread\nbutter\n",
+            "pinned": false,
+            "parents": [
+              3
+            ]
+          },
+          {
+            "at": "2026-10-01T10:00:00.000Z",
+            "origin": "user",
+            "title": "Groceries",
+            "content": "milk\neggs\n",
+            "pinned": false,
+            "parents": [
+              4
+            ]
+          },
+          {
+            "at": "2026-09-01T09:00:00.000Z",
+            "origin": "existing",
+            "title": "Groceries",
+            "content": "milk\n",
+            "pinned": false,
+            "parents": []
+          }
+        ]
+      }
+    },
+    {
+      "name": "restoring a version keeps the pin and what it replaced",
+      "library": {
+        "journals": [
+          {
+            "id": "j1",
+            "name": "Personal"
+          }
+        ],
+        "notes": [
+          {
+            "id": "n1",
+            "journalId": "j1",
+            "title": "Groceries",
+            "content": "milk\n",
+            "tags": [
+              "home"
+            ],
+            "createdAt": "2026-07-01T09:00:00.000Z",
+            "updatedAt": "2026-09-01T09:00:00.000Z"
+          },
+          {
+            "id": "n2",
+            "journalId": "j1",
+            "title": "Standup",
+            "content": "notes\n",
+            "tags": [],
+            "createdAt": "2026-07-01T09:00:00.000Z",
+            "updatedAt": "2026-09-01T09:00:00.000Z"
+          }
+        ]
+      },
+      "steps": [
+        {
+          "at": "2026-10-01T10:00:00.000Z",
+          "op": "updateNote",
+          "id": "n1",
+          "content": "milk\neggs\n"
+        },
+        {
+          "at": "2026-10-01T10:20:00.000Z",
+          "op": "updateNote",
+          "id": "n1",
+          "title": "Bread",
+          "content": "milk\neggs\nbread\n"
+        },
+        {
+          "at": "2026-10-01T10:22:00.000Z",
+          "op": "pin",
+          "id": "n1",
+          "pinned": true
+        },
+        {
+          "at": "2026-10-01T10:25:00.000Z",
+          "op": "restoreVersion",
+          "id": "n1",
+          "version": 1
+        },
+        {
+          "at": "2026-10-01T10:26:00.000Z",
+          "op": "restoreVersion",
+          "id": "n1",
+          "version": 0
+        },
+        {
+          "at": "2026-10-01T10:26:30.000Z",
+          "op": "restoreVersion",
+          "id": "n1",
+          "version": 99,
+          "error": "notFound"
+        },
+        {
+          "at": "2026-10-01T10:27:00.000Z",
+          "op": "updateNote",
+          "id": "n1",
+          "content": "milk\neggs\njam\n"
+        }
+      ],
+      "expected": {
+        "n1": [
+          {
+            "at": "2026-10-01T10:27:00.000Z",
+            "origin": "user",
+            "title": "Groceries",
+            "content": "milk\neggs\njam\n",
+            "pinned": true,
+            "parents": [
+              1
+            ]
+          },
+          {
+            "at": "2026-10-01T10:25:00.000Z",
+            "origin": "restore",
+            "title": "Groceries",
+            "content": "milk\neggs\n",
+            "pinned": true,
+            "parents": [
+              2
+            ]
+          },
+          {
+            "at": "2026-10-01T10:20:00.000Z",
+            "origin": "user",
+            "title": "Bread",
+            "content": "milk\neggs\nbread\n",
+            "pinned": true,
+            "parents": [
+              3
+            ]
+          },
+          {
+            "at": "2026-10-01T10:00:00.000Z",
+            "origin": "user",
+            "title": "Groceries",
+            "content": "milk\neggs\n",
+            "pinned": false,
+            "parents": [
+              4
+            ]
+          },
+          {
+            "at": "2026-09-01T09:00:00.000Z",
+            "origin": "existing",
+            "title": "Groceries",
+            "content": "milk\n",
+            "pinned": false,
+            "parents": []
+          }
+        ]
+      }
+    },
+    {
+      "name": "after 30 days, one version a day",
+      "library": {
+        "journals": [
+          {
+            "id": "j1",
+            "name": "Personal"
+          }
+        ],
+        "notes": [
+          {
+            "id": "n1",
+            "journalId": "j1",
+            "title": "Groceries",
+            "content": "milk\n",
+            "tags": [
+              "home"
+            ],
+            "createdAt": "2026-07-01T09:00:00.000Z",
+            "updatedAt": "2026-07-01T09:00:00.000Z"
+          },
+          {
+            "id": "n2",
+            "journalId": "j1",
+            "title": "Standup",
+            "content": "notes\n",
+            "tags": [],
+            "createdAt": "2026-07-01T09:00:00.000Z",
+            "updatedAt": "2026-07-01T09:00:00.000Z"
+          }
+        ]
+      },
+      "steps": [
+        {
+          "at": "2026-08-01T09:00:00.000Z",
+          "op": "updateNote",
+          "id": "n1",
+          "content": "a\n"
+        },
+        {
+          "at": "2026-08-01T15:00:00.000Z",
+          "op": "updateNote",
+          "id": "n1",
+          "content": "b\n"
+        },
+        {
+          "at": "2026-08-02T09:00:00.000Z",
+          "op": "updateNote",
+          "id": "n1",
+          "content": "c\n"
+        },
+        {
+          "at": "2026-08-20T09:00:00.000Z",
+          "op": "updateNote",
+          "id": "n1",
+          "content": "d\n"
+        },
+        {
+          "at": "2026-08-20T09:30:00.000Z",
+          "op": "updateNote",
+          "id": "n1",
+          "content": "e\n"
+        },
+        {
+          "at": "2026-09-10T10:00:00.000Z",
+          "op": "updateNote",
+          "id": "n1",
+          "content": "f\n"
+        }
+      ],
+      "expected": {
+        "n1": [
+          {
+            "at": "2026-09-10T10:00:00.000Z",
+            "origin": "user",
+            "title": "Groceries",
+            "content": "f\n",
+            "pinned": false,
+            "parents": [
+              1
+            ]
+          },
+          {
+            "at": "2026-08-20T09:30:00.000Z",
+            "origin": "user",
+            "title": "Groceries",
+            "content": "e\n",
+            "pinned": false,
+            "parents": [
+              2
+            ]
+          },
+          {
+            "at": "2026-08-20T09:00:00.000Z",
+            "origin": "user",
+            "title": "Groceries",
+            "content": "d\n",
+            "pinned": false,
+            "parents": [
+              3
+            ]
+          },
+          {
+            "at": "2026-08-02T09:00:00.000Z",
+            "origin": "user",
+            "title": "Groceries",
+            "content": "c\n",
+            "pinned": false,
+            "parents": [
+              4
+            ]
+          },
+          {
+            "at": "2026-08-01T15:00:00.000Z",
+            "origin": "user",
+            "title": "Groceries",
+            "content": "b\n",
+            "pinned": false,
+            "parents": [
+              5
+            ]
+          },
+          {
+            "at": "2026-07-01T09:00:00.000Z",
+            "origin": "existing",
+            "title": "Groceries",
+            "content": "milk\n",
+            "pinned": false,
+            "parents": []
+          }
+        ]
+      }
+    },
+    {
+      "name": "a new note, its delete, and restoring the delete",
+      "library": {
+        "journals": [
+          {
+            "id": "j1",
+            "name": "Personal"
+          }
+        ],
+        "notes": [
+          {
+            "id": "n1",
+            "journalId": "j1",
+            "title": "Groceries",
+            "content": "milk\n",
+            "tags": [
+              "home"
+            ],
+            "createdAt": "2026-07-01T09:00:00.000Z",
+            "updatedAt": "2026-09-01T09:00:00.000Z"
+          },
+          {
+            "id": "n2",
+            "journalId": "j1",
+            "title": "Standup",
+            "content": "notes\n",
+            "tags": [],
+            "createdAt": "2026-07-01T09:00:00.000Z",
+            "updatedAt": "2026-09-01T09:00:00.000Z"
+          }
+        ]
+      },
+      "steps": [
+        {
+          "at": "2026-10-01T10:00:00.000Z",
+          "op": "createNote",
+          "id": "n9",
+          "journalId": "j1",
+          "title": "New",
+          "content": "a\n"
+        },
+        {
+          "at": "2026-10-01T10:01:00.000Z",
+          "op": "updateNote",
+          "id": "n9",
+          "content": "b\n"
+        },
+        {
+          "at": "2026-10-01T10:02:00.000Z",
+          "origin": "import",
+          "op": "createNote",
+          "id": "n8",
+          "journalId": "j1",
+          "title": "Imported",
+          "content": "x\n"
+        },
+        {
+          "at": "2026-10-01T10:05:00.000Z",
+          "op": "deleteNote",
+          "id": "n9"
+        },
+        {
+          "at": "2026-10-01T10:06:00.000Z",
+          "op": "restoreDelete",
+          "id": "n9"
+        },
+        {
+          "at": "2026-10-01T10:07:00.000Z",
+          "op": "updateNote",
+          "id": "n9",
+          "content": "c\n"
+        },
+        {
+          "at": "2026-10-01T10:08:00.000Z",
+          "op": "deleteNote",
+          "id": "n2"
+        }
+      ],
+      "expected": {
+        "n9": [
+          {
+            "at": "2026-10-01T10:07:00.000Z",
+            "origin": "user",
+            "title": "New",
+            "content": "c\n",
+            "pinned": false,
+            "parents": [
+              1
+            ]
+          },
+          {
+            "at": "2026-10-01T10:06:00.000Z",
+            "origin": "restore",
+            "title": "New",
+            "content": "b\n",
+            "pinned": false,
+            "parents": []
+          }
+        ],
+        "n8": [
+          {
+            "at": "2026-10-01T10:02:00.000Z",
+            "origin": "import",
+            "title": "Imported",
+            "content": "x\n",
+            "pinned": false,
+            "parents": []
+          }
+        ],
+        "n2": []
+      }
+    }
+  ]
+}

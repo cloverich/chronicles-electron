@@ -117,6 +117,10 @@ adds a plaintext `keyId` field naming the domain (or `library`).
   plaintexts compare equal, but a known text can't be confirmed. Change
   detection is unchanged: devices compare their own plaintext revisions with
   their sync state.
+- **Parents** of a note record ([sync.md](sync.md#records)) are sent as an
+  envelope of their JSON under the domain record key, with AAD kind
+  `parents`, the note ID, and the domain's key id, in the record's `parents`
+  field. The server sees whether a record has them, nothing more.
 - **Moving a note** re-encrypts it under the new journal's domain, and its
   attachments are sent in that domain if they aren't there yet.
 - **Attachments** belong to a domain: one record per journal whose notes use

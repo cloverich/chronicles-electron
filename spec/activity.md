@@ -6,7 +6,7 @@ so a delete can be undone. Status: draft, implemented by the Swift app only.
 
 The log answers "where did that note go?" after the fact, from rows that stay
 readable when the note or journal is gone, and makes "sync deleted my notes"
-recoverable. It is not edit history (that is note versions, later) and not a
+recoverable. It is not edit history (that is [versions.md](versions.md)) and not a
 general event store.
 
 ## Rows
@@ -100,7 +100,9 @@ A `deleted` row with a payload can be restored (one without fails with
    is the one it had when deleted. Re-creating the ID removes its tombstone
    ([data-model.md](data-model.md#tombstone)); sync then sends it as a change.
    This writes `restored`.
-4. The `deleted` row loses its payload and gains `restoredAt`.
+4. The `deleted` row loses its payload and gains `restoredAt`. The note's
+   versions went with the delete; it starts a new history
+   ([versions.md](versions.md)).
 
 **Restoring a batch** restores every restorable `deleted` row in it, oldest
 first, skipping notes that exist; the rows it writes share a new batch.

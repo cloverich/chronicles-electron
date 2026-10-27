@@ -1,0 +1,250 @@
+{
+  "description": "Note versions in sync: parents travel with a note, so a device that lost its sync state merges against a version it shares (versions.md).",
+  "scenarios": [
+    {
+      "name": "after sync is turned off and on, edits merge against the version both devices had",
+      "devices": {
+        "a": "basic",
+        "b": null
+      },
+      "steps": [
+        {
+          "sync": "a"
+        },
+        {
+          "sync": "b"
+        },
+        {
+          "reset": "b"
+        },
+        {
+          "device": "a",
+          "op": "updateNote",
+          "request": {
+            "id": "03b9wsjvyu3t3ufq044kfzgru",
+            "journalId": "03aq5qh9copxys3mzz5l8q60f",
+            "title": "Gamma, renamed",
+            "content": "Roadmap follow-up.\n",
+            "tags": [],
+            "frontMatter": {
+              "source": "fixture",
+              "priority": 2
+            },
+            "updatedAt": "2024-04-01T00:00:00.000Z"
+          },
+          "response": {
+            "id": "03b9wsjvyu3t3ufq044kfzgru",
+            "revision": "$any"
+          }
+        },
+        {
+          "device": "b",
+          "op": "updateNote",
+          "request": {
+            "id": "03b9wsjvyu3t3ufq044kfzgru",
+            "journalId": "03aq5qh9copxys3mzz5l8q60f",
+            "title": "Gamma",
+            "content": "Roadmap follow-up, from b.\n",
+            "tags": [],
+            "frontMatter": {
+              "source": "fixture",
+              "priority": 2
+            },
+            "updatedAt": "2024-04-02T00:00:00.000Z"
+          },
+          "response": {
+            "id": "03b9wsjvyu3t3ufq044kfzgru",
+            "revision": "$any"
+          }
+        },
+        {
+          "sync": "a"
+        },
+        {
+          "sync": "b"
+        },
+        {
+          "sync": "a"
+        },
+        {
+          "device": "a",
+          "op": "getNote",
+          "request": {
+            "id": "03b9wsjvyu3t3ufq044kfzgru"
+          },
+          "response": {
+            "id": "03b9wsjvyu3t3ufq044kfzgru",
+            "journalId": "03aq5qh9copxys3mzz5l8q60f",
+            "title": "Gamma, renamed",
+            "content": "Roadmap follow-up, from b.\n",
+            "tags": [],
+            "createdAt": "2024-03-05T09:00:00.000Z",
+            "updatedAt": "2024-04-02T00:00:00.000Z",
+            "frontMatter": {
+              "source": "fixture",
+              "priority": 2
+            },
+            "revision": "$any"
+          }
+        },
+        {
+          "device": "b",
+          "op": "getNote",
+          "request": {
+            "id": "03b9wsjvyu3t3ufq044kfzgru"
+          },
+          "response": {
+            "id": "03b9wsjvyu3t3ufq044kfzgru",
+            "journalId": "03aq5qh9copxys3mzz5l8q60f",
+            "title": "Gamma, renamed",
+            "content": "Roadmap follow-up, from b.\n",
+            "tags": [],
+            "createdAt": "2024-03-05T09:00:00.000Z",
+            "updatedAt": "2024-04-02T00:00:00.000Z",
+            "frontMatter": {
+              "source": "fixture",
+              "priority": 2
+            },
+            "revision": "$any"
+          }
+        },
+        {
+          "device": "a",
+          "op": "searchNotes",
+          "request": {
+            "titles": [
+              "conflicted copy"
+            ]
+          },
+          "response": {
+            "items": []
+          }
+        },
+        {
+          "device": "b",
+          "op": "searchNotes",
+          "request": {
+            "titles": [
+              "conflicted copy"
+            ]
+          },
+          "response": {
+            "items": []
+          }
+        }
+      ]
+    },
+    {
+      "name": "after sync is turned off and on, edits to the same text still keep both",
+      "devices": {
+        "a": "basic",
+        "b": null
+      },
+      "steps": [
+        {
+          "sync": "a"
+        },
+        {
+          "sync": "b"
+        },
+        {
+          "reset": "b"
+        },
+        {
+          "device": "a",
+          "op": "updateNote",
+          "request": {
+            "id": "03b9wsjvyu3t3ufq044kfzgru",
+            "journalId": "03aq5qh9copxys3mzz5l8q60f",
+            "title": "Gamma",
+            "content": "Written on a.\n",
+            "tags": [],
+            "frontMatter": {
+              "source": "fixture",
+              "priority": 2
+            },
+            "updatedAt": "2024-04-01T00:00:00.000Z"
+          },
+          "response": {
+            "id": "03b9wsjvyu3t3ufq044kfzgru",
+            "revision": "$any"
+          }
+        },
+        {
+          "device": "b",
+          "op": "updateNote",
+          "request": {
+            "id": "03b9wsjvyu3t3ufq044kfzgru",
+            "journalId": "03aq5qh9copxys3mzz5l8q60f",
+            "title": "Gamma",
+            "content": "Written on b.\n",
+            "tags": [],
+            "frontMatter": {
+              "source": "fixture",
+              "priority": 2
+            },
+            "updatedAt": "2024-04-02T00:00:00.000Z"
+          },
+          "response": {
+            "id": "03b9wsjvyu3t3ufq044kfzgru",
+            "revision": "$any"
+          }
+        },
+        {
+          "sync": "a"
+        },
+        {
+          "sync": "b"
+        },
+        {
+          "sync": "a"
+        },
+        {
+          "device": "a",
+          "op": "getNote",
+          "request": {
+            "id": "03b9wsjvyu3t3ufq044kfzgru"
+          },
+          "response": {
+            "id": "03b9wsjvyu3t3ufq044kfzgru",
+            "journalId": "03aq5qh9copxys3mzz5l8q60f",
+            "title": "Gamma",
+            "content": "Written on a.\n",
+            "tags": [],
+            "createdAt": "2024-03-05T09:00:00.000Z",
+            "updatedAt": "2024-04-02T00:00:00.000Z",
+            "frontMatter": {
+              "source": "fixture",
+              "priority": 2
+            },
+            "revision": "$any"
+          }
+        },
+        {
+          "device": "a",
+          "op": "countNotes",
+          "request": {
+            "titles": [
+              "conflicted copy"
+            ]
+          },
+          "response": {
+            "count": 1
+          }
+        },
+        {
+          "device": "b",
+          "op": "countNotes",
+          "request": {
+            "titles": [
+              "conflicted copy"
+            ]
+          },
+          "response": {
+            "count": 1
+          }
+        }
+      ]
+    }
+  ]
+}

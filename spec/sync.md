@@ -27,6 +27,15 @@ Every journal, note, and attachment is one record, named by kind and id.
   The journal is referenced by ID, so a rename touches one record.
 - **Attachments** are immutable and never deleted by sync.
 
+**Parents.** A note record also carries `parents`: compact JSON
+`{"parents":[…],"revision":"…"}` naming the revisions the note's current
+version was made from ([versions.md](versions.md)) and the revision they
+belong to. A note without versions sends none. A receiver uses them only when
+`revision` equals the received note's revision, since a writer that doesn't
+know the field (Chronicles 0.5) leaves the previous value in place; otherwise
+the record has no parents. Tombstones carry none. Parents never change change
+detection: they travel with a note's save and are not a change of their own.
+
 **Deletes are records too.** Deleting a journal or note sends a _tombstone_:
 the same record with no payload, marked deleted, whose revision is empty. A
 tombstone is saved like any other change, so the server refuses it when
@@ -109,8 +118,11 @@ key (a missing key is a value): if `L` equals `B` take `R`; if `R` equals `B`
 take `L`; if `L` equals `R` take it; otherwise the field conflicts. `tags`
 merge as sets: a tag is kept when both sides have it or one side added it
 (it isn't in `B`), so either side can add or remove. `updatedAt` is the later
-of the two (code-point order). Without a base (state lost, a tombstone, or a
-library joining), every differing field conflicts and tags are the union.
+of the two (code-point order). Without a base in the sync state (state lost,
+a tombstone, or a library joining), the base is the local version whose
+revision is the first of `R`'s parents the device holds
+([versions.md](versions.md)), when there is one. Without either, every
+differing field conflicts and tags are the union.
 
 - A conflict in `title` or `content` **keeps both**: the note takes `R`'s value
   for its conflicting fields, and a _conflicted copy_ holds `L` unchanged
@@ -183,6 +195,8 @@ for `null`, with empty sync state; the server starts empty. A `device` step is
 a NotesClient step ([notes-client.md](notes-client.md#fixtures)) run on that
 device, with the same placeholders; bindings are shared across devices. A
 `sync` step has the device receive everything new on the server, send all
-pending changes, and repeat until neither side has anything new. The server
+pending changes, and repeat until neither side has anything new. A `reset`
+step forgets that device's sync state, as turning sync off does (its library
+and versions stay), so its next `sync` is a join. The server
 holds the latest version of each record and refuses stale saves, nothing more.
 A scenario passes when every step does.

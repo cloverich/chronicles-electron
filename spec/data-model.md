@@ -66,7 +66,11 @@ preserved verbatim.
 | `originalName` | string?   | Informational                            |
 | `createdAt`    | timestamp |                                          |
 
-Attachments are immutable. Nothing is garbage-collected automatically.
+Attachments are immutable. Nothing is garbage-collected automatically. A host
+may offer to remove unused attachments: an attachment is **in use** while a
+note, a version ([versions.md](versions.md)), or a restorable activity
+payload ([activity.md](activity.md)) references it, so restoring either
+never brings back a broken image. Only attachments not in use are removed.
 
 ### Revision
 
@@ -76,7 +80,8 @@ stored form** (`chronicles://note/…`, `chronicles://attachment/…`). It depen
 on the note alone: an exported file differs only where link destinations were
 rewritten, and its manifest entry carries this revision, not the file's hash.
 
-Every write recomputes it. An update may carry `baseRevision`; if it differs
+Every write recomputes it, and keeps the previous state as a version
+([versions.md](versions.md)). An update may carry `baseRevision`; if it differs
 from the stored revision the update fails with a conflict and nothing is
 written. Revisions give equality, not order. **[now]**
 

@@ -148,14 +148,24 @@ Until there is a publication record, the bundle root is the record: scan
 `<root>/*/*/index.md` and read `chronicles.id` and `chronicles.revision`.
 Requires `provenance`.
 
-| State     | Condition                                                |
-| --------- | -------------------------------------------------------- |
-| Draft     | No bundle carries the note's ID.                         |
-| Published | A bundle carries the ID and the note's current revision. |
-| Edited    | A bundle carries the ID and a different revision.        |
+| State                    | Condition                                                                |
+| ------------------------ | ------------------------------------------------------------------------ |
+| Draft                    | No bundle carries the note's ID.                                         |
+| Published                | A bundle carries the ID, and the note's revision or the same post.       |
+| Changed since publishing | A bundle carries the ID and another revision, and the post would change. |
 
-_Edited_ compares revisions, so it also appears after edits the bundle would
-not show (a private key, a tag not allowlisted). Version 1 accepts that.
+**Would the post change?** When the bundle's revision differs from the note's,
+project the note as it is now with the same target and published map, and
+compare the result's `index.md` with the bundle's, ignoring the `chronicles`
+line. Equal means the edit doesn't reach the post (a private key, a pin, a
+tag not allowlisted): the note is still _Published_. A projection that fails
+counts as changed. A host that can't project (no target config at hand)
+compares revisions alone.
+
+**What changed.** The bundle names the revision it was published from. A host
+that keeps versions ([versions.md](versions.md)) shows that version beside
+the note, so the person sees what publishing again would change, and can
+restore it.
 
 The same scan gives the `published` map: ID → `<urlPrefix><date>/<slug>/`.
 
