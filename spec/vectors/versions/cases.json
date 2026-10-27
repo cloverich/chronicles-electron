@@ -306,6 +306,100 @@
       }
     },
     {
+      "name": "assistant writes keep a version each, and the user's next edit doesn't replace one",
+      "library": {
+        "journals": [
+          {
+            "id": "j1",
+            "name": "Personal"
+          }
+        ],
+        "notes": [
+          {
+            "id": "n1",
+            "journalId": "j1",
+            "title": "Groceries",
+            "content": "milk\n",
+            "tags": [
+              "home"
+            ],
+            "createdAt": "2026-07-01T09:00:00.000Z",
+            "updatedAt": "2026-09-01T09:00:00.000Z"
+          }
+        ]
+      },
+      "steps": [
+        {
+          "at": "2026-10-01T10:00:00.000Z",
+          "origin": "assistant",
+          "op": "updateNote",
+          "id": "n1",
+          "content": "milk\neggs\n"
+        },
+        {
+          "at": "2026-10-01T10:03:00.000Z",
+          "origin": "assistant",
+          "op": "updateNote",
+          "id": "n1",
+          "content": "milk\neggs\nbread\n"
+        },
+        {
+          "at": "2026-10-01T10:05:00.000Z",
+          "op": "updateNote",
+          "id": "n1",
+          "content": "milk\neggs\nbread\nbutter\n"
+        },
+        {
+          "at": "2026-10-01T10:07:00.000Z",
+          "op": "updateNote",
+          "id": "n1",
+          "content": "milk\neggs\nbread\nbutter\njam\n"
+        }
+      ],
+      "expected": {
+        "n1": [
+          {
+            "at": "2026-10-01T10:07:00.000Z",
+            "origin": "user",
+            "title": "Groceries",
+            "content": "milk\neggs\nbread\nbutter\njam\n",
+            "pinned": false,
+            "parents": [
+              1
+            ]
+          },
+          {
+            "at": "2026-10-01T10:03:00.000Z",
+            "origin": "assistant",
+            "title": "Groceries",
+            "content": "milk\neggs\nbread\n",
+            "pinned": false,
+            "parents": [
+              2
+            ]
+          },
+          {
+            "at": "2026-10-01T10:00:00.000Z",
+            "origin": "assistant",
+            "title": "Groceries",
+            "content": "milk\neggs\n",
+            "pinned": false,
+            "parents": [
+              3
+            ]
+          },
+          {
+            "at": "2026-09-01T09:00:00.000Z",
+            "origin": "existing",
+            "title": "Groceries",
+            "content": "milk\n",
+            "pinned": false,
+            "parents": []
+          }
+        ]
+      }
+    },
+    {
       "name": "restoring a version keeps the pin and what it replaced",
       "library": {
         "journals": [

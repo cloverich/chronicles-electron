@@ -18,7 +18,7 @@ lost their sync state can still merge against a version they share.
 | `parents`  | revisions it was made from: none, one (an edit), or two (a merge)                  |
 | `at`       | the time of the write (for a replaced version, the latest write)                   |
 | `device`   | the device that wrote it (a display name, as in activity.md)                       |
-| `origin`   | `user`, `sync`, `import`, `restore`, or `existing` (below)                         |
+| `origin`   | `user`, `sync`, `import`, `assistant`, `restore`, or `existing` (below)            |
 | `file`     | the note file (export format, references in stored form), whose hash is `revision` |
 
 A note's versions are listed newest first: the reverse of the order they were
@@ -33,7 +33,7 @@ Every write that changes a note's revision writes or replaces one version:
 | Write                                                   | Version                                                         |
 | ------------------------------------------------------- | --------------------------------------------------------------- |
 | Create (any origin)                                     | origin of the write, no parents                                 |
-| Update (the editor, bulk, import)                       | origin of the write, parents: the previous revision             |
+| Update (the editor, bulk, import, an assistant)         | origin of the write, parents: the previous revision             |
 | Received from sync, taken whole                         | origin `sync`, parents: the record's parents, else as an update |
 | Received from sync, merged                              | origin `sync`, parents: the local and the received revision     |
 | Restoring a version (below)                             | origin `restore`, parents: the previous revision                |
@@ -64,7 +64,9 @@ version, taking its `parents`, instead of being added when:
 
 Windows don't slide, so a long writing session keeps a version every ten
 minutes. `restore` and `existing` versions are never replaced, so whatever a
-restore replaced, and the note as it was before versions, stay.
+restore replaced, and the note as it was before versions, stay. `assistant`
+versions neither replace nor are replaced: each assistant write can be undone
+on its own.
 
 ### Thinning
 

@@ -20,6 +20,7 @@ Node code.
 | [activity.md](activity.md)           | The local activity log: what changed, and restoring deletes       |
 | [versions.md](versions.md)           | Note versions: past states, their parents, and restoring one      |
 | [encryption.md](encryption.md)       | End-to-end encryption of synced records: keys, envelope, records  |
+| [assistant.md](assistant.md)         | Tools an assistant may use over the library, and their scope      |
 | `vectors/`                           | Golden inputs and expected outputs                                |
 
 ## Status

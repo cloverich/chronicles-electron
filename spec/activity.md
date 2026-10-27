@@ -16,7 +16,7 @@ general event store.
 | `id`          | a UUID25 (time-ordered), unique                                            |
 | `at`          | timestamp of the change (for a coalesced row, its latest change)           |
 | `device`      | the device that wrote the row (a display name; never an account id)        |
-| `origin`      | what made the change: `user`, `sync`, or `import`                          |
+| `origin`      | what made the change: `user`, `sync`, `import`, or `assistant`             |
 | `kind`        | below                                                                      |
 | `batchId`     | null, or shared by every row of one bulk change, journal delete, or import |
 | `noteId`      | the note, for note rows                                                    |
@@ -70,6 +70,8 @@ Moves name journals, not IDs, so a row reads the same after a journal is gone.
   `journal.deleted`, all under one batch.
 - **Import:** every row the import writes shares one batch, origin `import`.
 - **Sync:** received changes write the same rows, origin `sync`, no batch.
+- **Assistant:** changes made through the assistant tools
+  ([assistant.md](assistant.md)) write the same rows, origin `assistant`, no batch.
 
 Rows are written in the same transaction as the change: a row never exists
 without its change, or the reverse. Reads, navigation, search, and rebuilding
