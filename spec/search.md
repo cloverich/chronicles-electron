@@ -116,11 +116,13 @@ Results are newest first.
 ## Parameters beside the text
 
 A tool that takes other arguments with the search text (an assistant's
-`search_notes`, Shortcuts' Find Notes) applies each as if its operator were
-written after the text: a journal is `in:` (it is never a journal that
-doesn't exist; that argument is an error), a tag is `#tag`, and a date is
-`before:`/`after:` (so it replaces one in the text). A whole-day "to" date is
-`before:` the following day.
+`search_notes`, Shortcuts' Find Notes) adds each as its operator would: a
+journal as `in:` (any of them; a journal argument naming no journal is an
+error, not an empty search) and a tag as `#tag`. A date range narrows the
+text's dates rather than replacing them: a "from" date is `after:` unless the
+text's `after:` is later, and a "to" date (inclusive, a whole day) is
+`before:` the following day unless the text's `before:` is earlier. Every
+filter given holds.
 
 ## Vectors
 

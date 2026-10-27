@@ -76,10 +76,9 @@ A tool the grant's access doesn't allow is not listed, and calling it fails
 - **`search_notes`:** `query` is the app's search syntax
   ([search.md](search.md): words, quoted phrases, `#tag`, `-#tag`, `in:name`,
   `in:"a name"`, `-in:`, `title:`, `date:2026-10`, `before:`, `after:`).
-  `journal`, `tag`, `from`, and `to` apply as their operators would written
-  after `query` ([search.md](search.md#parameters-beside-the-text)): `journal`
-  is `in:` (an unknown one fails `not_found`), `tag` is `#tag`, `from` is
-  `after:`, and `to` is `before:` the next day. `from` and `to` are dates
+  `journal` and `tag` add to it as `in:` and `#tag` would (an unknown
+  `journal` fails `not_found`), and `from` and `to` narrow its dates
+  ([search.md](search.md#parameters-beside-the-text)). `from` and `to` are dates
   (`YYYY-MM-DD`, UTC), inclusive, on `createdAt`. Newest first by
   `createdAt`. `limit` defaults to 20, at most 100. `cursor` is a previous
   result's `nextCursor`.
