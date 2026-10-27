@@ -8,8 +8,8 @@ import { TagTokenParser } from "./search/parsers/tag";
 import { TextTokenParser } from "./search/parsers/text";
 import { TitleTokenParser } from "./search/parsers/title";
 
-// TODO: This won't allow searching where value has colon in it
-const tokenRegex = /^(.*):(.*)/;
+// The prefix is up to the first colon, so a value may hold colons.
+const tokenRegex = /^([^:]*):(.*)/;
 
 interface TokenParser<T = any> {
   prefix: string;
@@ -69,8 +69,12 @@ export class SearchParser {
       prefix = prefix.substring(1);
     }
 
-    const parser: TokenParser = (parsers as any)[prefix];
-    if (!parser) return;
+    // Any other colon is text (`10:30`, `is:conflicted`); spec/search.md
+    // reads it from the text chip.
+    const parser: TokenParser = (parsers as any)[prefix.toLowerCase()];
+    if (!parser) {
+      return [parsers.text, parsers.text.parse(tokenStr)];
+    }
 
     const parsedToken = parser.parse(value);
     if (!parsedToken) return;

@@ -17,6 +17,12 @@ import type {
 import { JournalsStore } from "../../hooks/stores/journals";
 import { MaintenanceStore } from "../../hooks/stores/maintenance";
 import { SearchParser } from "./SearchParser";
+import {
+  ParsedSearch,
+  matchesNothing,
+  parseSearch,
+  quoteValue,
+} from "./search/parseSearch";
 import { SearchToken } from "./search/tokens";
 
 export interface SearchItem {
@@ -135,14 +141,7 @@ export class SearchStore {
    * NOTE: This should be private, or refactored to trigger a search
    */
   setTokens = (tokens: SearchToken[]) => {
-    // Filter out invalid in: journal tokens
-    // Additional validation can go here as well
-    tokens = tokens.filter((t) => {
-      if (t.type !== "in") return true;
-      if (!this.journals.journals.find((j) => j.name === t.value)) return false;
-      return true;
-    });
-
+    // An `in:` naming no journal stays, and finds nothing (spec/search.md).
     this.tokens.replace(tokens);
   };
 
@@ -150,59 +149,13 @@ export class SearchStore {
     return this._tokens;
   }
 
-  // todo: this might be better as a @computed get
-  private tokensToQuery = (): NoteQuery => {
-    const journals = this.tokens
-      .filter((t) => t.type === "in" && !(t as any).excluded)
-      .map((token) => token.value) as string[]; // assumes pre-validated by addToeken above
-
-    const excludedJournals = this.tokens
-      .filter((t) => t.type === "in" && (t as any).excluded)
-      .map((token) => token.value) as string[];
-
-    const tags = this.tokens
-      .filter((t) => t.type === "tag" && !(t as any).excluded)
-      .map((t) => t.value) as string[];
-
-    const excludedTags = this.tokens
-      .filter((t) => t.type === "tag" && (t as any).excluded)
-      .map((t) => t.value) as string[];
-
-    // todo: Typescript doesn't know when I filter to type === 'title' its TitleTokens
-    // its confused by the nodeMatch type
-    const titles = this.tokens
-      .filter((t) => t.type === "title")
-      .map((t) => t.value) as any as string[];
-    const texts = this.tokens
-      .filter((t) => t.type === "text")
-      .map((t) => t.value) as any as string[];
-    const before = this.tokens.find((t) => t.type === "before")?.value as
-      string | undefined;
-    const after = this.tokens.find((t) => t.type === "after")?.value as
-      string | undefined;
-
-    const dateToken = this.tokens.find((t) => t.type === "date");
-    const date = dateToken?.value as string | undefined;
-
-    // `in:` tokens name journals; the query takes ids.
-    const ids = (names: string[]) =>
-      names.flatMap((name) => {
-        const id = this.journals.journals.find((j) => j.name === name)?.id;
-        return id ? [id] : [];
-      });
-
-    return {
-      journalIds: ids(journals),
-      excludeJournalIds: ids(excludedJournals),
-      tags,
-      excludeTags: excludedTags,
-      titles,
-      texts,
-      date,
-      before,
-      after,
-    };
+  // Chips are read as the search text they stand for (spec/search.md, "Chips").
+  private parsed = (): ParsedSearch => {
+    const text = this.tokens.map(chipText).join(" ");
+    return parseSearch(text, this.journals.journals);
   };
+
+  private tokensToQuery = (): NoteQuery => this.parsed().query;
 
   /** The active search as a contract query (no paging). */
   get query(): NoteQuery {
@@ -275,6 +228,14 @@ export class SearchStore {
     };
 
     try {
+      if (matchesNothing(this.parsed())) {
+        this.docs = [];
+        this.nextId = null;
+        this.count = 0;
+        this.loading = false;
+        return;
+      }
+
       const docs = (await this.notes.searchNotes(q)).items.map(
         this.toSearchItem,
       );
@@ -385,4 +346,26 @@ export class SearchStore {
     this.cursor = this.lastIds.pop() ?? null;
     this.search({ resetPagination: false });
   };
+}
+
+/** A chip as search text; values with spaces are quoted. */
+function chipText(token: SearchToken): string {
+  switch (token.type) {
+    case "in":
+      return (token.excluded ? "-" : "") + "in:" + quoteValue(token.value);
+    case "tag":
+      return (token.excluded ? "-" : "") + "tag:" + quoteValue(token.value);
+    case "title":
+      return "title:" + quoteValue(token.value);
+    case "text":
+      // A word chip may be an operator (`#idea`, `is:conflicted`); a chip with
+      // spaces is one phrase.
+      return /\s/.test(token.value) ? quoteValue(token.value) : token.value;
+    case "before":
+    case "after":
+    case "date":
+      return `${token.type}:${token.value}`;
+    default:
+      return ""; // filter: isn't part of search
+  }
 }

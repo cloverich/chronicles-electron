@@ -10,22 +10,10 @@ export class TagTokenParser {
   parse = (text: string): TagToken | undefined => {
     if (!text) return;
 
-    // trim # from the beginning of the tag
-    if (text.startsWith("#")) {
-      text = text.slice(1);
-    }
-
-    // remove spaces, snake_case -- arbitrary style decision
-    text = text.replace(/ /g, "_");
-    text = text.replace(/,/g, "_");
-    text = text.toLowerCase();
-
-    // remove `:` characters, since its reserved for search prefix e.g. `tag:my_tag`, `title: ...`, etc.
-    text = text.replace(/:/g, "_");
-
-    // max length, probably all search tokens need this? Or only this one since its persisted?
-    // todo: A consistent strategy here.
-    text = text.slice(0, 20);
+    // Tags are matched as written, without the # (spec/search.md).
+    text = text.replace(/"/g, "");
+    if (text.startsWith("#")) text = text.slice(1);
+    if (!text) return;
 
     return { type: "tag", value: text };
   };

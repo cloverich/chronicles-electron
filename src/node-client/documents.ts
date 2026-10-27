@@ -462,7 +462,8 @@ export class DocumentsClient {
     // default SQLITE_MAX_VARIABLE_NUMBER is 999; fine for typical result sets.
     if (q?.texts?.length) {
       const ftsTerms = q.texts
-        .map((t) => `"${t.replace(/"/g, '""')}"`)
+        // A phrase whose last word may be a prefix (spec/search.md).
+        .map((t) => `"${t.replace(/"/g, '""')}"*`)
         .join(" ");
       const ftsRows = await this.db.all<{ id: string }>(
         sql`SELECT id FROM documents_fts WHERE documents_fts MATCH ${ftsTerms}`,

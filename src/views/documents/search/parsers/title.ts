@@ -7,6 +7,7 @@ export class TitleTokenParser {
   };
 
   parse = (text: string): TitleToken | undefined => {
+    text = text.replace(/"/g, "");
     if (!text) return;
 
     return { type: "title", value: text };

@@ -7,6 +7,8 @@ export class JournalTokenParser {
   };
 
   parse = (text: string): JournalToken | undefined => {
+    // `in:"old blog"` and `in:old blog` both name "old blog".
+    text = text.replace(/"/g, "");
     if (!text) return;
 
     return { type: "in", value: text };
