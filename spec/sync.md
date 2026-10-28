@@ -78,9 +78,10 @@ Saves go journals first, then notes, then attachments (a note may reach
 another device before its attachment; it shows the image once it arrives).
 Tombstones go notes first, then journals.
 
-**Delete guard:** when more than 50 note tombstones are pending at once, no
-tombstone is sent until the person confirms them; saves still go. Confirming
-releases the tombstones pending at that moment.
+Deletes are sent like any other change, however many there are: nothing asks
+first. The undo is Activity (activity.md): every device that applies a delete,
+sent or received, keeps the note restorable for 30 days, and a restored note
+is an ordinary new save that every device receives.
 
 Every save is conditional on the server still holding the version the device
 last saw (CloudKit: the record's change tag), or on the record not existing
