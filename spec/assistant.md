@@ -14,12 +14,14 @@ the app, not by keys.
 
 A grant has:
 
-| Field      | Meaning                                                                            |
-| ---------- | ---------------------------------------------------------------------------------- |
-| `journals` | the journal IDs the assistant may see; new journals are not added                  |
-| `access`   | `read`, `add` (read, create notes, append to notes), or `edit` (also update notes) |
+| Field         | Meaning                                                                            |
+| ------------- | ---------------------------------------------------------------------------------- |
+| `journals`    | the journal IDs the assistant may see; new journals are not added                  |
+| `access`      | `read`, `add` (read, create notes, append to notes), or `edit` (also update notes) |
+| `diagnostics` | whether the assistant may read the app's diagnostics ([below](#diagnostics))       |
 
-Access is off until the person grants it. Outside the grant, things don't
+Access is off until the person grants it, and `diagnostics` is off until the
+person turns it on. Outside the grant, things don't
 exist for the assistant:
 
 - A note is visible when its journal is in `journals`. Reading, appending to,
@@ -31,7 +33,8 @@ exist for the assistant:
 - An attachment is visible through a visible note whose content references it.
 
 An assistant never deletes notes, moves them between journals, changes
-journals, or touches settings, sync, or export.
+journals, or touches settings, sync, or export. With `diagnostics` it can read
+how the app is set up and what it did lately, never change it.
 
 ## Changes
 
@@ -58,19 +61,20 @@ Timestamps are as stored. Notes are returned with their content in stored
 form: links as `chronicles://note/<id>`, attachments as
 `chronicles://attachment/<sha256><ext>`.
 
-| Tool              | Access | Arguments                                                                 | Result                                                    |
-| ----------------- | ------ | ------------------------------------------------------------------------- | --------------------------------------------------------- |
-| `list_journals`   | read   | none                                                                      | `journals`: `id`, `name`, `archived`, `noteCount`         |
-| `list_tags`       | read   | none                                                                      | `tags`: `tag`, `count`, most used first                   |
-| `search_notes`    | read   | `query`, `journal`, `tag`, `from`, `to`, `limit`, `cursor` (all optional) | `notes` (rows), `nextCursor` when more match              |
-| `read_note`       | read   | `id`                                                                      | the note                                                  |
-| `read_attachment` | read   | `noteId`, `file` (`<sha256><ext>`)                                        | an image as MCP image content; any other file as its size |
-| `create_note`     | add    | `journal`, `content`, `title`, `tags`                                     | the note                                                  |
-| `append_to_note`  | add    | `id`, `text`                                                              | the note                                                  |
-| `update_note`     | edit   | `id`, `revision`, `title`, `content`, `tags`                              | the note                                                  |
+| Tool               | Access                   | Arguments                                                                 | Result                                                    |
+| ------------------ | ------------------------ | ------------------------------------------------------------------------- | --------------------------------------------------------- |
+| `list_journals`    | read                     | none                                                                      | `journals`: `id`, `name`, `archived`, `noteCount`         |
+| `list_tags`        | read                     | none                                                                      | `tags`: `tag`, `count`, most used first                   |
+| `search_notes`     | read                     | `query`, `journal`, `tag`, `from`, `to`, `limit`, `cursor` (all optional) | `notes` (rows), `nextCursor` when more match              |
+| `read_note`        | read                     | `id`                                                                      | the note                                                  |
+| `read_attachment`  | read                     | `noteId`, `file` (`<sha256><ext>`)                                        | an image as MCP image content; any other file as its size |
+| `create_note`      | add                      | `journal`, `content`, `title`, `tags`                                     | the note                                                  |
+| `append_to_note`   | add                      | `id`, `text`                                                              | the note                                                  |
+| `update_note`      | edit                     | `id`, `revision`, `title`, `content`, `tags`                              | the note                                                  |
+| `read_diagnostics` | read, with `diagnostics` | `activity`, `syncLines` (both optional)                                   | [below](#diagnostics)                                     |
 
 A tool the grant's access doesn't allow is not listed, and calling it fails
-`unsupported`.
+`unsupported`; so is `read_diagnostics` while `diagnostics` is off.
 
 - **`journal`** is a visible journal's ID or its name (case-insensitive).
 - **`search_notes`:** `query` is the app's search syntax
@@ -91,3 +95,45 @@ A tool the grant's access doesn't allow is not listed, and calling it fails
 
 Errors are tool errors (MCP `isError`) whose text starts with the NotesClient
 error code: `not_found`, `conflict`, `invalid_input`, or `unsupported`.
+
+## Diagnostics
+
+`read_diagnostics` lets an assistant debug the app from the person's real
+library (sync, settings, where a note went) without seeing notes outside the
+grant. The result has:
+
+| Field      | Meaning                                                                                                                    |
+| ---------- | -------------------------------------------------------------------------------------------------------------------------- |
+| `app`      | `name`, `version`, `build`, `commit` (null when unknown), `os`, and `device` (as activity rows name it)                    |
+| `library`  | `notes` and `journals`: counts over the whole library, numbers only                                                        |
+| `settings` | display, list, and sync preferences, per app; never paths, folder names, account IDs, or keys                              |
+| `activity` | the newest activity rows ([activity.md](activity.md)), newest first, redacted as below                                     |
+| `sync`     | `log`: the newest lines of the app's sync log, oldest first; `errors`: its newest 20 error and failure lines, oldest first |
+
+`activity` is how many rows, default 50, at most 500. `syncLines` is how many
+log lines, default 100, at most 1000. An app without sync gives an empty
+`log` and `errors`. The sync log is the one the person reads in the app;
+it names records by ID and counts batches, and holds no titles, journal names,
+tags, or content (an app whose log could must leave them out here).
+
+**A row** has `id`, `at`, `device`, `origin`, `kind`, `batchId`, `noteId`,
+`journalId`, `title`, `journalName`, `detail`, and `restorable`; never the
+payload. A row is inside the grant when its `journalId` is one of the grant's
+`journals`. For a row outside the grant:
+
+- `title` and `journalName` are null.
+- In `detail`, numbers and `restoredAt` stay, and `tags` (on `tagged` and
+  `untagged`) becomes `tagCount`, the number of tags. Every other value
+  (`from` and `to`) is null.
+
+A row inside the grant is as stored, except that `from` and `to` of `moved`
+stay only when they name a journal in the grant (ignoring ASCII case);
+otherwise they are null, so a note moved in from another journal doesn't name
+it.
+
+So a row outside the grant shows that something happened, when, on which
+device, by what origin, and to which IDs, but no title, name, tag, or text
+from it.
+
+Each call to `read_diagnostics` is listed among the assistant's requests like
+any tool call.
