@@ -264,7 +264,7 @@ Testing with a custom dark theme (Neofloss) revealed several issues. All fixed i
 
 ### Code syntax themes (hljs)
 
-Replaced hardcoded Tailwind hljs color classes with dynamically loaded highlight.js theme CSS. Code themes are selectable per-mode in Settings > Appearance. Infrastructure is complete but **syntax highlighting only applies to the first line** due to Plate's `code_line` collapse bug — see [#176](https://github.com/cloverich/chronicles/issues/176).
+Replaced hardcoded Tailwind hljs color classes with dynamically loaded highlight.js theme CSS. Code themes are selectable per-mode in Settings > Appearance. Infrastructure is complete but **syntax highlighting only applies to the first line** due to Plate's `code_line` collapse bug — see [#176](https://github.com/cloverich/chronicles-electron/issues/176).
 
 ---
 

@@ -175,7 +175,7 @@ export const cases = {
       },
     },
 
-    // Nah. https://github.com/cloverich/chronicles/issues/256
+    // Nah. https://github.com/cloverich/chronicles-electron/issues/256
     //   {
     //     name: "Title with multi-line front matter",
     //     input: `# Project Plan

@@ -476,7 +476,7 @@ export class ImporterClient {
             ),
           );
         // todo: pre-validate ids are unique
-        // https://github.com/cloverich/chronicles/issues/248
+        // https://github.com/cloverich/chronicles-electron/issues/248
         console.error(
           "Error creating document after import",
           item.sourcePath,

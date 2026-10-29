@@ -1,12 +1,15 @@
 # Chronicles spec
 
-Language-neutral definition of Chronicles data. Any implementation (Electron/Node
-today, Swift next) reads, writes, and verifies against these documents and the
-vectors beside them. Data compatibility is the boundary between apps; API shape
-is per-app.
+Language-neutral definition of Chronicles data. Any implementation (the native
+apps in [cloverich/chronicles](https://github.com/cloverich/chronicles), the
+Electron app in
+[cloverich/chronicles-electron](https://github.com/cloverich/chronicles-electron))
+reads, writes, and verifies against these documents and the vectors beside them.
+Data compatibility is the boundary between apps; API shape is per-app.
 
-Another repository may vendor this directory as-is. Nothing here depends on the
-Node code.
+Apps vendor this repository as `spec/` (everything but `scripts/`) at a pinned
+commit, which they record in `spec/VENDORED`. Nothing here depends on any app's
+code; `scripts/` holds reference generators that need only Node.
 
 | Document                             | Defines                                                           |
 | ------------------------------------ | ----------------------------------------------------------------- |

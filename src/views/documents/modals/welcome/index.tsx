@@ -55,7 +55,7 @@ export default function Welcome({ onComplete }: { onComplete: () => void }) {
                 repository - but check&nbsp;
                 <a
                   className="font-medium underline underline-offset-4"
-                  href="https://github.com/cloverich/chronicles/issues/160"
+                  href="https://github.com/cloverich/chronicles-electron/issues/160"
                 >
                   the roadmap
                 </a>

@@ -2,7 +2,9 @@
 
 ## Current Plan
 
-Planning lives in Engram (journal "chronicles", tag `planning`). Start at the **Chronicles ecosystem roadmap** note (`03gzds1t5ol59s5d8mj1by9wi`); it links the data spec, export spec, NotesClient seam, Swift app, and deferred sync notes. Anything work is waiting on Chris for goes in **Waiting on Chris** (`03h4a7ekurd5aeceixsw71se4`) with exact steps; move items to its Done section when answered.
+**Maintenance only.** Chronicles continues as native apps in [cloverich/chronicles](https://github.com/cloverich/chronicles); this Electron app gets security patches and import/export compatibility with the spec, nothing else. The spec lives in [cloverich/chronicles-spec](https://github.com/cloverich/chronicles-spec); `spec/` here is a vendored copy (`scripts/sync-spec.sh [<sha>]`, from `../chronicles-spec`). Don't edit it by hand: change chronicles-spec, then re-vendor. `UPDATE_VECTORS=1 yarn test:node` may regenerate vectors here; copy those back to chronicles-spec.
+
+Planning lives in Engram (journal "chronicles"). Start at **The End is Near** (`03h3idst9x21pgj4wpma4bl80`). Anything work is waiting on Chris for goes in **Chris: QA and tasks** (`03h4a7ekurd5aeceixsw71se4`) with exact steps; move items to its Done section when answered.
 
 1. Get Chronicles (Electron) to the seam: export format spec, data spec v1 migrations, `NotesClient` contract with fixtures.
 2. Build a standalone Swift app (Mac + iPhone) from those specs, forking in the Lexical UI.
@@ -42,7 +44,7 @@ IMPORTANT: Prefer reading these docs over relying on training data when working 
 
 - [docs/development.md](docs/development.md): Install, run, test, lint, build commands and project conventions. Read first.
 - [docs/architecture.md](docs/architecture.md): Tech stack, process model, DB schema. Read when reasoning about cross-cutting concerns.
-- [spec/README.md](spec/README.md): Language-neutral data model, export format, derive rules, NotesClient contract, and their golden vectors. Read before changing storage, links, attachments, export/import, or the NotesClient.
+- [spec/README.md](spec/README.md) (vendored from chronicles-spec): Language-neutral data model, export format, derive rules, NotesClient contract, and their golden vectors. Read before changing storage, links, attachments, export/import, or the NotesClient.
 - [docs/editor/markdown-pipeline.md](docs/editor/markdown-pipeline.md): Lexical's markdown roundtrip, plus the separate micromark -> MDAST -> remark pipeline used by the indexer/search/import. Read when touching parsing or serialization.
 - [docs/editor/plugins.md](docs/editor/plugins.md): Lexical plugin set and conventions. Read when adding or modifying editor behavior.
 - [docs/editor/styling.md](docs/editor/styling.md): Editor CSS and Tailwind theming. Read when changing editor appearance.

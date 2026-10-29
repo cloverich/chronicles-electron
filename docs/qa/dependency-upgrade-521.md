@@ -1,6 +1,6 @@
 # Dependency upgrade #521
 
-Validated on 2026-10-11 after rebasing [PR #521](https://github.com/cloverich/chronicles/pull/521) onto current master (`a2ca051`).
+Validated on 2026-10-11 after rebasing [PR #521](https://github.com/cloverich/chronicles-electron/pull/521) onto current master (`a2ca051`).
 
 ## Changes
 

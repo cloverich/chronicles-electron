@@ -44,7 +44,7 @@ _These release notes are AI generated._
 **Fixes**
 * fix: one complete fix per line (#124)
 
-**Full Changelog**: https://github.com/cloverich/chronicles/compare/vPREV...vX.Y.Z
+**Full Changelog**: https://github.com/cloverich/chronicles-electron/compare/vPREV...vX.Y.Z
 ```
 
 Group related PRs/commits into one line per feature or fix. Omit docs-only commits and superseded spikes. Pick a 2–4 word release theme for the title.
