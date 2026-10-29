@@ -1,7 +1,5 @@
 #
 
-> **Maintenance only.** Chronicles continues as native iPhone and Mac apps in [cloverich/chronicles](https://github.com/cloverich/chronicles). This Electron app gets security fixes and keeps reading and writing the [shared export format](https://github.com/cloverich/chronicles-spec), so a library moves between them losslessly.
-
 <div align="center">
     <img src="icons/src/input_icon.png" width="200" height="200">
   <h1>Chronicles</h1>
@@ -12,6 +10,8 @@
   <br>
   <br>
 </div>
+
+> **Maintenance only.** Chronicles continues as native iPhone and Mac apps in [cloverich/chronicles](https://github.com/cloverich/chronicles). This Electron app gets security fixes and keeps reading and writing the [shared export format](https://github.com/cloverich/chronicles-spec), so a library moves between them losslessly.
 
 **Status**: Experimental. This application is still in the prototype phase, the UX, functionality, and storage format may change at any time and with little regard for usability, stability, or appearances. However breaking changes will be called out in [releases](https://github.com/cloverich/chronicles-electron/releases) and upcoming changes may be found in pinned issues; see the [roadmap](https://github.com/cloverich/chronicles-electron/issues/160) for the longer term plan. As long as the application is developed it will be kept up to date.
 
